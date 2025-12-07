@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+
+model Influencer {
+  id              String   @id @default(cuid())
+  username        String   @unique
+  displayName     String
+  bio             String?
+  profileImage    String?
+  createdAt       DateTime @default(now())
+  
+  recommendations Recommendation[]
+}
+
+model Place {
+  id             String   @id @default(cuid())
+  googlePlaceId  String?  @unique
+  name           String
+  address        String
+  latitude       Float
+  longitude      Float
+  city           String
+  locationNotes  String?
+  createdAt      DateTime @default(now())
+  
+  recommendations Recommendation[]
+}
+
+model Recommendation {
+  id           String   @id @default(cuid())
+  dishes       String[]
+  videoUrl     String?
+  isSponsored  Boolean  @default(false)
+  notes        String?
+  createdAt    DateTime @default(now())
+  
+  influencer   Influencer @relation(fields: [influencerId], references: [id])
+  influencerId String
+  
+  place        Place @relation(fields: [placeId], references: [id])
+  placeId      String
+}
