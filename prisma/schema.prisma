@@ -21,7 +21,6 @@ model Influencer {
   
   recommendations Recommendation[]
 }
-
 model Place {
   id             String   @id @default(cuid())
   googlePlaceId  String?  @unique
@@ -31,11 +30,11 @@ model Place {
   longitude      Float
   city           String
   locationNotes  String?
+  category       String   @default("restaurant")
   createdAt      DateTime @default(now())
   
   recommendations Recommendation[]
 }
-
 model Recommendation {
   id           String   @id @default(cuid())
   dishes       String[]

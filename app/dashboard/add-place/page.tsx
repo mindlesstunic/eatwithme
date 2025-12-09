@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { APIProvider } from "@vis.gl/react-google-maps";
+import PlaceAutocomplete from "@/components/PlaceAutocomplete";
 
 export default function AddPlacePage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [manualEntry, setManualEntry] = useState(false);
 
   // Place fields
   const [placeName, setPlaceName] = useState("");
@@ -16,12 +19,31 @@ export default function AddPlacePage() {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [locationNotes, setLocationNotes] = useState("");
+  const [googlePlaceId, setGooglePlaceId] = useState("");
 
   // Recommendation fields
   const [dishes, setDishes] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [isSponsored, setIsSponsored] = useState(false);
   const [notes, setNotes] = useState("");
+
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  const handlePlaceSelect = (place: {
+    name: string;
+    address: string;
+    city: string;
+    latitude: number;
+    longitude: number;
+    googlePlaceId: string;
+  }) => {
+    setPlaceName(place.name);
+    setAddress(place.address);
+    setCity(place.city);
+    setLatitude(place.latitude.toString());
+    setLongitude(place.longitude.toString());
+    setGooglePlaceId(place.googlePlaceId);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +61,7 @@ export default function AddPlacePage() {
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),
           locationNotes: locationNotes || null,
+          googlePlaceId: googlePlaceId || null,
         },
         recommendation: {
           dishes: dishes
@@ -68,92 +91,131 @@ export default function AddPlacePage() {
       <h1 className="text-3xl font-bold mb-8">Add a Place</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Place Details */}
+        {/* Place Search */}
         <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Place Details</h2>
+          <h2 className="text-xl font-semibold">Find the Place</h2>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Place Name *
-            </label>
-            <input
-              type="text"
-              value={placeName}
-              onChange={(e) => setPlaceName(e.target.value)}
-              className="w-full p-3 border rounded-lg"
-              placeholder="Bawarchi Restaurant"
-              required
-            />
-          </div>
+          {!manualEntry ? (
+            <>
+              {apiKey ? (
+                <APIProvider apiKey={apiKey}>
+                  <PlaceAutocomplete onPlaceSelect={handlePlaceSelect} />
+                </APIProvider>
+              ) : (
+                <p className="text-red-500">Google Maps API key missing</p>
+              )}
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Address *</label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full p-3 border rounded-lg"
-              placeholder="RTC X Roads, Hyderabad"
-              required
-            />
-          </div>
+              {placeName && (
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="font-medium">{placeName}</p>
+                  <p className="text-sm text-gray-500">{address}</p>
+                  <p className="text-xs text-gray-400">
+                    {city} • {latitude}, {longitude}
+                  </p>
+                </div>
+              )}
 
-          <div>
-            <label className="block text-sm font-medium mb-1">City *</label>
-            <input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full p-3 border rounded-lg"
-              placeholder="Hyderabad"
-              required
-            />
-          </div>
+              <button
+                type="button"
+                onClick={() => setManualEntry(true)}
+                className="text-sm text-gray-500 underline"
+              >
+                Can't find it? Enter manually
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Place Name *
+                </label>
+                <input
+                  type="text"
+                  value={placeName}
+                  onChange={(e) => setPlaceName(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                  placeholder="Bawarchi Restaurant"
+                  required
+                />
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Latitude *
-              </label>
-              <input
-                type="text"
-                value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
-                className="w-full p-3 border rounded-lg"
-                placeholder="17.4156"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Longitude *
-              </label>
-              <input
-                type="text"
-                value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
-                className="w-full p-3 border rounded-lg"
-                placeholder="78.4989"
-                required
-              />
-            </div>
-          </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Address *
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                  placeholder="RTC X Roads, Hyderabad"
+                  required
+                />
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Location Notes
-            </label>
-            <input
-              type="text"
-              value={locationNotes}
-              onChange={(e) => setLocationNotes(e.target.value)}
-              className="w-full p-3 border rounded-lg"
-              placeholder="Near the bus stop, opposite HDFC bank"
-            />
-            <p className="text-xs text-gray-400 mt-1">
-              Helpful for places not on Google Maps
-            </p>
-          </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">City *</label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                  placeholder="Hyderabad"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Latitude *
+                  </label>
+                  <input
+                    type="text"
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    placeholder="17.4156"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Longitude *
+                  </label>
+                  <input
+                    type="text"
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                    className="w-full p-3 border rounded-lg"
+                    placeholder="78.4989"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Location Notes
+                </label>
+                <input
+                  type="text"
+                  value={locationNotes}
+                  onChange={(e) => setLocationNotes(e.target.value)}
+                  className="w-full p-3 border rounded-lg"
+                  placeholder="Near the bus stop, opposite HDFC bank"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setManualEntry(false)}
+                className="text-sm text-gray-500 underline"
+              >
+                ← Back to search
+              </button>
+            </>
+          )}
         </section>
 
         {/* Recommendation Details */}
@@ -225,7 +287,7 @@ export default function AddPlacePage() {
           </button>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !placeName || !dishes}
             className="flex-1 p-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
           >
             {loading ? "Adding..." : "Add Place"}
