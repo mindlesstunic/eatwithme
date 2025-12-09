@@ -2,7 +2,7 @@
  * Recommendation Card Component
  *
  * Displays a single recommendation with edit/delete actions.
- * Handles delete confirmation and API calls.
+ * Uses card styling with warm accents.
  */
 
 "use client";
@@ -31,9 +31,6 @@ export default function RecommendationCard({ recommendation }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // ============================================
-  // Handle delete with confirmation
-  // ============================================
   const handleDelete = async () => {
     setDeleting(true);
 
@@ -46,7 +43,6 @@ export default function RecommendationCard({ recommendation }: Props) {
     });
 
     if (res.ok) {
-      // Refresh the page to show updated list
       router.refresh();
     } else {
       alert("Failed to delete recommendation");
@@ -56,7 +52,7 @@ export default function RecommendationCard({ recommendation }: Props) {
   };
 
   return (
-    <div className="border p-4 rounded-lg">
+    <div className="card">
       {/* ============================================
           Place Info
           ============================================ */}
@@ -64,32 +60,30 @@ export default function RecommendationCard({ recommendation }: Props) {
         <div>
           <Link
             href={`/place/${recommendation.place.id}`}
-            className="font-semibold hover:underline"
+            className="font-semibold text-lg hover:text-[var(--color-primary)] transition-colors"
           >
             {recommendation.place.name}
           </Link>
-          <p className="text-gray-500 text-sm">
+          <p className="text-[var(--color-foreground-secondary)] text-sm mt-1">
             {recommendation.place.address}
           </p>
         </div>
 
-        {/* Sponsored Badge */}
         {recommendation.isSponsored && (
-          <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-            Sponsored
-          </span>
+          <span className="badge-sponsored">Sponsored</span>
         )}
       </div>
 
       {/* ============================================
           Recommendation Details
           ============================================ */}
-      <p className="text-gray-600 mt-2">
-        Dishes: {recommendation.dishes.join(", ")}
+      <p className="text-[var(--color-foreground-secondary)] mt-3">
+        <span className="font-medium text-[var(--color-foreground)]">Try:</span>{" "}
+        {recommendation.dishes.join(", ")}
       </p>
 
       {recommendation.notes && (
-        <p className="text-gray-500 text-sm mt-1 italic">
+        <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
           "{recommendation.notes}"
         </p>
       )}
@@ -99,7 +93,7 @@ export default function RecommendationCard({ recommendation }: Props) {
           href={recommendation.videoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+          className="link text-sm mt-3 inline-block"
         >
           View video →
         </a>
@@ -108,10 +102,10 @@ export default function RecommendationCard({ recommendation }: Props) {
       {/* ============================================
           Action Buttons
           ============================================ */}
-      <div className="mt-4 pt-4 border-t flex gap-4">
+      <div className="mt-4 pt-4 border-t border-[var(--color-border)] flex gap-4">
         <Link
           href={`/dashboard/edit/${recommendation.id}`}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm font-medium text-[var(--color-primary)] hover:opacity-80"
         >
           Edit
         </Link>
@@ -119,24 +113,25 @@ export default function RecommendationCard({ recommendation }: Props) {
         {!showConfirm ? (
           <button
             onClick={() => setShowConfirm(true)}
-            className="text-sm text-red-600 hover:underline"
+            className="text-sm font-medium text-[var(--color-error)] hover:opacity-80"
           >
             Delete
           </button>
         ) : (
-          /* Delete Confirmation */
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Are you sure?</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-[var(--color-foreground-muted)]">
+              Are you sure?
+            </span>
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="text-sm text-red-600 hover:underline disabled:opacity-50"
+              className="text-sm font-medium text-[var(--color-error)] hover:opacity-80 disabled:opacity-50"
             >
               {deleting ? "Deleting..." : "Yes, delete"}
             </button>
             <button
               onClick={() => setShowConfirm(false)}
-              className="text-sm text-gray-500 hover:underline"
+              className="text-sm text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
             >
               Cancel
             </button>

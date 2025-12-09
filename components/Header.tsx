@@ -1,3 +1,10 @@
+/**
+ * Header Component
+ *
+ * Main navigation with logo, links, and auth state.
+ * Responsive with mobile menu.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -8,6 +15,7 @@ import { User } from "@supabase/supabase-js";
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -27,36 +35,119 @@ export default function Header() {
   };
 
   return (
-    <header className="border-b">
-      <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold">
-          EatWithMe
-        </Link>
+    <header className="border-b border-[var(--color-border)] bg-[var(--color-background)] sticky top-0 z-50">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* ============================================
+              Logo
+              ============================================ */}
+          <Link href="/" className="text-xl font-bold flex items-center gap-2">
+            <span className="text-2xl">🍽️</span>
+            <span>EatWithMe.app</span>
+          </Link>
 
-        <nav className="flex items-center gap-4">
-          {loading ? (
-            <span className="text-gray-400 text-sm">...</span>
-          ) : user ? (
-            <>
-              <Link href="/dashboard" className="text-sm hover:underline">
-                Dashboard
+          {/* ============================================
+              Desktop Navigation
+              ============================================ */}
+          <nav className="hidden sm:flex items-center gap-6">
+            {loading ? (
+              <span className="text-[var(--color-foreground-muted)] text-sm">
+                ...
+              </span>
+            ) : user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium hover:text-[var(--color-primary)] transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm text-[var(--color-foreground-secondary)] hover:text-[var(--color-foreground)] transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="btn-primary text-sm">
+                Join as Influencer
               </Link>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-black"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login"
-              className="text-sm px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+            )}
+          </nav>
+
+          {/* ============================================
+              Mobile Menu Button
+              ============================================ */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2 -mr-2"
+            aria-label="Toggle menu"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              Login
-            </Link>
-          )}
-        </nav>
+              {mobileMenuOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
+
+        {/* ============================================
+            Mobile Menu
+            ============================================ */}
+        {mobileMenuOpen && (
+          <nav className="sm:hidden pt-4 pb-2 border-t border-[var(--color-border)] mt-4 space-y-3">
+            {loading ? (
+              <span className="text-[var(--color-foreground-muted)] text-sm">
+                Loading...
+              </span>
+            ) : user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="block py-2 text-sm font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block py-2 text-sm text-[var(--color-foreground-secondary)]"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="btn-primary block text-center text-sm"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Join as Influencer
+              </Link>
+            )}
+          </nav>
+        )}
       </div>
     </header>
   );

@@ -1,8 +1,8 @@
 /**
  * Discovery View Component
- *
- * Shows map/list toggle view of all places.
- * Handles empty state, user location, and distance sorting.
+ * 
+ * Full-page map view for discovery with toggle to list.
+ * Map takes full viewport for immersive browsing.
  */
 
 "use client";
@@ -45,7 +45,6 @@ export default function DiscoveryView({ places }: Props) {
     lng: number;
   } | null>(null);
 
-  // Track page view
   usePageView();
 
   useEffect(() => {
@@ -78,7 +77,6 @@ export default function DiscoveryView({ places }: Props) {
     });
   };
 
-  // Sort places by distance if we have user location
   const sortedPlaces = userLocation
     ? [...places].sort((a, b) => {
         const distA = getDistanceKm(
@@ -98,104 +96,131 @@ export default function DiscoveryView({ places }: Props) {
     : places;
 
   // ============================================
-  // Empty State - No places at all
+  // Empty State
   // ============================================
   if (places.length === 0) {
     return (
-      <EmptyState
-        icon="🍽️"
-        title="No places yet"
-        description="Be the first to add food recommendations! Are you an influencer?"
-        actionLabel="Join as Influencer"
-        actionHref="/login"
-      />
+      <div className="p-4 sm:p-6">
+        <EmptyState
+          icon="🍽️"
+          title="No places yet"
+          description="Be the first to add food recommendations! Are you an influencer?"
+          actionLabel="Join as Influencer"
+          actionHref="/login"
+        />
+      </div>
     );
   }
 
+  // ============================================
+  // Map View - Full Page
+  // ============================================
+  if (view === "map") {
+    return (
+      <div className="relative">
+        {/* Floating Toggle */}
+        <div className="absolute top-4 right-4 z-30">
+          <ViewToggle view={view} onViewChange={handleViewChange} />
+        </div>
+
+        {/* Floating Title */}
+        <div className="absolute top-4 left-4 z-30 bg-[var(--color-background)]/90 backdrop-blur-sm px-4 py-2 rounded-[var(--radius-lg)] shadow-md">
+          <h1 className="text-lg font-bold">Discover</h1>
+          <p className="text-sm text-[var(--color-foreground-secondary)]">
+            {places.length} place{places.length !== 1 && "s"}
+          </p>
+        </div>
+
+        {/* Full Page Map */}
+        <Map 
+          places={places} 
+          fullHeight={true}
+          center={userLocation || undefined}
+        />
+      </div>
+    );
+  }
+
+  // ============================================
+  // List View
+  // ============================================
   return (
-    <div>
-      {/* Toggle */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">
-          {places.length} Place{places.length !== 1 && "s"}
-        </h2>
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Discover</h1>
+          <p className="text-[var(--color-foreground-secondary)]">
+            {places.length} place{places.length !== 1 && "s"}
+          </p>
+        </div>
         <ViewToggle view={view} onViewChange={handleViewChange} />
       </div>
 
-      {/* Map View */}
-      {view === "map" && <Map places={places} />}
+      {/* List */}
+      <div className="space-y-4">
+        {sortedPlaces.map((place) => {
+          const distance = userLocation
+            ? getDistanceKm(
+                userLocation.lat,
+                userLocation.lng,
+                place.latitude,
+                place.longitude
+              )
+            : null;
 
-      {/* List View */}
-      {view === "list" && (
-        <div className="space-y-4">
-          {sortedPlaces.map((place) => {
-            const distance = userLocation
-              ? getDistanceKm(
-                  userLocation.lat,
-                  userLocation.lng,
-                  place.latitude,
-                  place.longitude
-                )
-              : null;
-
-            return (
-              <div key={place.id} className="border p-4 rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <a
-                      href={`/place/${place.id}`}
-                      className="text-lg font-semibold hover:underline"
-                    >
-                      {place.name}
-                    </a>
-                    <p className="text-gray-500 text-sm">{place.address}</p>
-                  </div>
-                  {distance !== null && (
-                    <span className="text-sm text-gray-500 whitespace-nowrap ml-4">
-                      {formatDistance(distance)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Get Directions */}
-
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => handleDirectionClick(place)}
-                  className="text-sm text-blue-600 hover:underline inline-block mt-2"
-                >
-                  Get directions →
-                </a>
-
-                <div className="mt-3 pt-3 border-t">
-                  <p className="text-sm text-gray-600">
-                    Recommended by {place.recommendations.length} influencer
-                    {place.recommendations.length !== 1 && "s"}
+          return (
+            <div key={place.id} className="card">
+              <div className="flex items-start justify-between">
+                <div>
+                  
+                   <a href={`/place/${place.id}`}
+                    className="text-lg font-semibold hover:text-[var(--color-primary)] transition-colors"
+                  >
+                    {place.name}
+                  </a>
+                  <p className="text-[var(--color-foreground-secondary)] text-sm">
+                    {place.address}
                   </p>
-                  {place.recommendations.map((rec) => (
-                    <div key={rec.id} className="mt-2 text-sm">
-                      <span className="font-medium">
-                        @{rec.influencer.username}
-                      </span>
-                      <span className="text-gray-500">
-                        {" "}
-                        — {rec.dishes.join(", ")}
-                      </span>
-                      {rec.isSponsored && (
-                        <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">
-                          Sponsored
-                        </span>
-                      )}
-                    </div>
-                  ))}
                 </div>
+                {distance !== null && (
+                  <span className="text-sm text-[var(--color-foreground-muted)] whitespace-nowrap ml-4">
+                    {formatDistance(distance)}
+                  </span>
+                )}
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              
+               <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleDirectionClick(place)}
+                className="link text-sm inline-block mt-2"
+              >
+                Get directions →
+              </a>
+
+              <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
+                <p className="text-sm text-[var(--color-foreground-secondary)]">
+                  Recommended by {place.recommendations.length} influencer
+                  {place.recommendations.length !== 1 && "s"}
+                </p>
+                {place.recommendations.map((rec) => (
+                  <div key={rec.id} className="mt-2 text-sm">
+                    <span className="font-medium">@{rec.influencer.username}</span>
+                    <span className="text-[var(--color-foreground-secondary)]">
+                      {" "}— {rec.dishes.join(", ")}
+                    </span>
+                    {rec.isSponsored && (
+                      <span className="badge-sponsored ml-2">Sponsored</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

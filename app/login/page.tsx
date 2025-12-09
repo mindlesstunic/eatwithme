@@ -1,8 +1,8 @@
 /**
  * Login Page
- * 
+ *
  * Handles both login and signup for influencers.
- * Displays any auth errors from callbacks.
+ * Styled with warm accent colors.
  */
 
 "use client";
@@ -10,40 +10,35 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
   const supabase = createClient();
 
-  // ============================================
-  // Check for error in URL params (from callback)
-  // ============================================
   useEffect(() => {
     const error = searchParams.get("error");
     if (error) {
       setMessage(error);
+      setIsError(true);
     }
   }, [searchParams]);
 
-  // ============================================
-  // Handle form submission
-  // ============================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    setIsError(false);
 
     if (isSignUp) {
-      // ============================================
-      // Sign up - sends confirmation email
-      // ============================================
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -53,19 +48,19 @@ export default function LoginPage() {
       });
       if (error) {
         setMessage(error.message);
+        setIsError(true);
       } else {
         setMessage("Check your email for the confirmation link!");
+        setIsError(false);
       }
     } else {
-      // ============================================
-      // Login with email and password
-      // ============================================
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) {
         setMessage(error.message);
+        setIsError(true);
       } else {
         window.location.href = "/dashboard";
       }
@@ -75,73 +70,99 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="min-h-[calc(100vh-73px)] flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          {isSignUp ? "Create Account" : "Welcome Back"}
-        </h1>
+        {/* ============================================
+            Header
+            ============================================ */}
+        <div className="text-center mb-8">
+          <span className="text-5xl mb-4 block">🍽️</span>
+          <h1 className="text-3xl font-bold mb-2">
+            {isSignUp ? "Join EatWithMe" : "Welcome Back"}
+          </h1>
+          <p className="text-[var(--color-foreground-secondary)]">
+            {isSignUp
+              ? "Create your food recommendation map"
+              : "Sign in to manage your recommendations"}
+          </p>
+        </div>
 
+        {/* ============================================
+            Form
+            ============================================ */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Field */}
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border rounded-lg"
+              className="input"
               placeholder="you@example.com"
               required
             />
           </div>
 
-          {/* Password Field */}
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-sm font-medium mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border rounded-lg"
+              className="input"
               placeholder="••••••••"
               required
               minLength={6}
             />
           </div>
 
-          {/* Message (error or success) */}
           {message && (
-            <p className={`text-sm text-center ${
-              message.includes("Check your email") 
-                ? "text-green-600" 
-                : "text-red-600"
-            }`}>
+            <p
+              className={`text-sm text-center p-3 rounded-[var(--radius-md)] ${
+                isError
+                  ? "bg-red-50 text-[var(--color-error)] dark:bg-red-900/20"
+                  : "bg-green-50 text-[var(--color-success)] dark:bg-green-900/20"
+              }`}
+            >
               {message}
             </p>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full p-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
+            className="btn-primary w-full"
           >
-            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Log In"}
+            {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
           </button>
         </form>
 
-        {/* Toggle Login/Signup */}
-        <p className="text-center mt-6 text-sm text-gray-600">
+        {/* ============================================
+            Toggle Sign Up / Login
+            ============================================ */}
+        <p className="text-center mt-6 text-[var(--color-foreground-secondary)]">
           {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
             onClick={() => {
               setIsSignUp(!isSignUp);
               setMessage("");
             }}
-            className="text-black font-medium underline"
+            className="font-medium text-[var(--color-primary)] hover:opacity-80"
           >
-            {isSignUp ? "Log In" : "Sign Up"}
+            {isSignUp ? "Sign In" : "Sign Up"}
           </button>
+        </p>
+
+        {/* ============================================
+            Back Link
+            ============================================ */}
+        <p className="text-center mt-4">
+          <Link
+            href="/"
+            className="text-sm text-[var(--color-foreground-muted)] hover:text-[var(--color-foreground)]"
+          >
+            ← Back to discovery
+          </Link>
         </p>
       </div>
     </main>

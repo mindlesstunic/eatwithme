@@ -1,3 +1,10 @@
+/**
+ * View Toggle Component
+ *
+ * Switches between map and list views.
+ * Uses warm accent color for active state.
+ */
+
 "use client";
 
 type Props = {
@@ -7,13 +14,13 @@ type Props = {
 
 export default function ViewToggle({ view, onViewChange }: Props) {
   return (
-    <div className="inline-flex rounded-lg border overflow-hidden">
+    <div className="inline-flex rounded-[var(--radius-md)] border border-[var(--color-border)] overflow-hidden">
       <button
         onClick={() => onViewChange("map")}
         className={`px-4 py-2 text-sm font-medium transition-colors ${
           view === "map"
-            ? "bg-black text-white"
-            : "bg-white text-gray-600 hover:bg-gray-50"
+            ? "bg-[var(--color-primary)] text-white"
+            : "bg-[var(--color-background)] text-[var(--color-foreground-secondary)] hover:bg-[var(--color-background-secondary)]"
         }`}
       >
         Map
@@ -22,8 +29,8 @@ export default function ViewToggle({ view, onViewChange }: Props) {
         onClick={() => onViewChange("list")}
         className={`px-4 py-2 text-sm font-medium transition-colors ${
           view === "list"
-            ? "bg-black text-white"
-            : "bg-white text-gray-600 hover:bg-gray-50"
+            ? "bg-[var(--color-primary)] text-white"
+            : "bg-[var(--color-background)] text-[var(--color-foreground-secondary)] hover:bg-[var(--color-background-secondary)]"
         }`}
       >
         List
