@@ -1,8 +1,16 @@
+/**
+ * Discovery View Component
+ *
+ * Shows map/list toggle view of all places.
+ * Handles empty state, user location, and distance sorting.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Map from "@/components/Map";
 import ViewToggle from "@/components/ViewToggle";
+import EmptyState from "@/components/EmptyState";
 import { getDistanceKm, formatDistance } from "@/lib/distance";
 import { track } from "@/lib/track";
 import { usePageView } from "@/hooks/usePageView";
@@ -88,6 +96,21 @@ export default function DiscoveryView({ places }: Props) {
         return distA - distB;
       })
     : places;
+
+  // ============================================
+  // Empty State - No places at all
+  // ============================================
+  if (places.length === 0) {
+    return (
+      <EmptyState
+        icon="🍽️"
+        title="No places yet"
+        description="Be the first to add food recommendations! Are you an influencer?"
+        actionLabel="Join as Influencer"
+        actionHref="/login"
+      />
+    );
+  }
 
   return (
     <div>

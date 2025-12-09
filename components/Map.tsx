@@ -1,3 +1,11 @@
+/**
+ * Map Component
+ *
+ * Displays Google Map with markers for places.
+ * Shows loading skeleton while Google Maps API loads.
+ * Includes InfoWindow with place details on marker click.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -8,6 +16,7 @@ import {
   InfoWindow,
 } from "@vis.gl/react-google-maps";
 import { track } from "@/lib/track";
+import Skeleton from "@/components/Skeleton";
 
 type Recommendation = {
   id: string;
@@ -41,9 +50,13 @@ export default function Map({
   places = [],
 }: MapProps) {
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
+  // ============================================
+  // Error state: No API key
+  // ============================================
   if (!apiKey) {
     return (
       <div className="p-4 bg-red-100 text-red-700 rounded-lg">
@@ -52,6 +65,9 @@ export default function Map({
     );
   }
 
+  // ============================================
+  // Tracking handlers
+  // ============================================
   const handleMarkerClick = (place: Place) => {
     setSelectedPlace(place);
     track({
@@ -77,12 +93,25 @@ export default function Map({
 
   return (
     <APIProvider apiKey={apiKey}>
-      <div className="w-full h-[400px] rounded-lg overflow-hidden">
+      <div className="w-full h-[400px] rounded-lg overflow-hidden relative">
+        {/* ============================================
+            Loading skeleton - shows until map loads
+            ============================================ */}
+        {!mapLoaded && (
+          <div className="absolute inset-0 z-10">
+            <Skeleton className="w-full h-full rounded-lg" />
+          </div>
+        )}
+
+        {/* ============================================
+            Google Map
+            ============================================ */}
         <GoogleMap
           defaultCenter={center}
           defaultZoom={zoom}
           mapId={process.env.NEXT_PUBLIC_GOOGLE_MAP_ID}
           onClick={() => setSelectedPlace(null)}
+          onTilesLoaded={() => setMapLoaded(true)}
         >
           {places.map((place) => (
             <AdvancedMarker
@@ -95,6 +124,9 @@ export default function Map({
             </AdvancedMarker>
           ))}
 
+          {/* ============================================
+              InfoWindow - shows on marker click
+              ============================================ */}
           {selectedPlace && (
             <InfoWindow
               position={{

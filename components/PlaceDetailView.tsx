@@ -1,6 +1,14 @@
+/**
+ * Place Detail View Component
+ *
+ * Shows all recommendations for a specific place.
+ * Handles empty state and tracks user interactions.
+ */
+
 "use client";
 
 import { track } from "@/lib/track";
+import EmptyState from "@/components/EmptyState";
 
 type Recommendation = {
   id: string;
@@ -56,7 +64,9 @@ export default function PlaceDetailView({ place }: Props) {
 
   return (
     <div>
-      {/* Header */}
+      {/* ============================================
+          Header
+          ============================================ */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold">{place.name}</h1>
@@ -73,7 +83,9 @@ export default function PlaceDetailView({ place }: Props) {
         )}
       </div>
 
-      {/* Get Directions */}
+      {/* ============================================
+          Get Directions Button
+          ============================================ */}
 
       <a
         href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
@@ -85,49 +97,67 @@ export default function PlaceDetailView({ place }: Props) {
         Get Directions →
       </a>
 
-      {/* Recommendations */}
+      {/* ============================================
+          Recommendations Section
+          ============================================ */}
       <h2 className="text-xl font-semibold mb-4">
         {place.recommendations.length} Recommendation
         {place.recommendations.length !== 1 && "s"}
       </h2>
 
-      <div className="space-y-4">
-        {place.recommendations.map((rec) => (
-          <div key={rec.id} className="border p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <a
-                href={`/@${rec.influencer.username}`}
-                className="font-medium hover:underline"
-              >
-                @{rec.influencer.username}
-              </a>
-              {rec.isSponsored && (
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">
-                  Sponsored
-                </span>
+      {/* ============================================
+          Empty State
+          ============================================ */}
+      {place.recommendations.length === 0 ? (
+        <EmptyState
+          icon="🤔"
+          title="No recommendations"
+          description="This place doesn't have any recommendations yet."
+        />
+      ) : (
+        /* ============================================
+           Recommendation Cards
+           ============================================ */
+        <div className="space-y-4">
+          {place.recommendations.map((rec) => (
+            <div key={rec.id} className="border p-4 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <a
+                  href={`/@${rec.influencer.username}`}
+                  className="font-medium hover:underline"
+                >
+                  @{rec.influencer.username}
+                </a>
+                {rec.isSponsored && (
+                  <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">
+                    Sponsored
+                  </span>
+                )}
+              </div>
+
+              <p className="text-gray-600">Try: {rec.dishes.join(", ")}</p>
+
+              {rec.notes && (
+                <p className="text-gray-500 text-sm mt-2 italic">
+                  "{rec.notes}"
+                </p>
+              )}
+
+              {rec.videoUrl && (
+                <a
+                  href={rec.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleVideoClick(rec)}
+                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                >
+                  Watch video →
+                </a>
               )}
             </div>
-
-            <p className="text-gray-600">Try: {rec.dishes.join(", ")}</p>
-
-            {rec.notes && (
-              <p className="text-gray-500 text-sm mt-2 italic">"{rec.notes}"</p>
-            )}
-
-            {rec.videoUrl && (
-              <a
-                href={rec.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => handleVideoClick(rec)}
-                className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-              >
-                Watch video →
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

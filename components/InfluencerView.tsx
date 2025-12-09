@@ -1,8 +1,16 @@
+/**
+ * Influencer View Component
+ *
+ * Shows map/list toggle view of an influencer's recommendations.
+ * Handles empty state, user location, and distance sorting.
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
 import Map from "@/components/Map";
 import ViewToggle from "@/components/ViewToggle";
+import EmptyState from "@/components/EmptyState";
 import { getDistanceKm, formatDistance } from "@/lib/distance";
 import { track } from "@/lib/track";
 
@@ -121,6 +129,19 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
       },
     ],
   }));
+
+  // ============================================
+  // Empty State - No recommendations
+  // ============================================
+  if (recommendations.length === 0) {
+    return (
+      <EmptyState
+        icon="🍜"
+        title="No recommendations yet"
+        description={`${influencer.displayName} hasn't added any food recommendations yet. Check back soon!`}
+      />
+    );
+  }
 
   return (
     <div>
