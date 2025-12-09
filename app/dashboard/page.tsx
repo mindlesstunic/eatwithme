@@ -54,17 +54,31 @@ export default async function DashboardPage() {
   // ============================================
   return (
     <main className="p-6">
-      {/* Header */}
-      <h1 className="text-3xl font-bold">Welcome, {influencer.displayName}!</h1>
-      <p className="text-gray-500 mt-2">
-        Your page:{" "}
-        <a href={`/@${influencer.username}`} className="underline">
-          eatwithme.app/@{influencer.username}
-        </a>
-      </p>
+      {/* Header Section */}
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">
+            Welcome, {influencer.displayName}!
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Your page:{" "}
+            <a href={`/@${influencer.username}`} className="underline">
+              eatwithme.app/@{influencer.username}
+            </a>
+          </p>
+        </div>
+
+        {/* Edit Profile Link */}
+        <Link
+          href="/dashboard/profile"
+          className="text-sm text-gray-500 hover:text-black hover:underline"
+        >
+          Edit Profile
+        </Link>
+      </div>
 
       {/* Recommendations Section */}
-      <div className="mt-8">
+      <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">
             Your Recommendations ({influencer.recommendations.length})
@@ -79,9 +93,17 @@ export default async function DashboardPage() {
 
         {/* Empty State */}
         {influencer.recommendations.length === 0 ? (
-          <p className="text-gray-500">
-            No recommendations yet. Add your first place!
-          </p>
+          <div className="border-2 border-dashed rounded-lg p-8 text-center">
+            <p className="text-gray-500 mb-4">
+              No recommendations yet. Add your first place!
+            </p>
+            <Link
+              href="/dashboard/add-place"
+              className="inline-block px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800"
+            >
+              + Add Place
+            </Link>
+          </div>
         ) : (
           /* Recommendations List */
           <div className="space-y-4">
