@@ -1,9 +1,19 @@
+/**
+ * Login Page
+ * 
+ * Handles both login and signup for influencers.
+ * Displays any auth errors from callbacks.
+ */
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,15 +22,34 @@ export default function LoginPage() {
 
   const supabase = createClient();
 
+  // ============================================
+  // Check for error in URL params (from callback)
+  // ============================================
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      setMessage(error);
+    }
+  }, [searchParams]);
+
+  // ============================================
+  // Handle form submission
+  // ============================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
     if (isSignUp) {
+      // ============================================
+      // Sign up - sends confirmation email
+      // ============================================
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
       if (error) {
         setMessage(error.message);
@@ -28,6 +57,9 @@ export default function LoginPage() {
         setMessage("Check your email for the confirmation link!");
       }
     } else {
+      // ============================================
+      // Login with email and password
+      // ============================================
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -50,6 +82,7 @@ export default function LoginPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email Field */}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -62,6 +95,7 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Password Field */}
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
@@ -75,10 +109,18 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Message (error or success) */}
           {message && (
-            <p className="text-sm text-center text-red-600">{message}</p>
+            <p className={`text-sm text-center ${
+              message.includes("Check your email") 
+                ? "text-green-600" 
+                : "text-red-600"
+            }`}>
+              {message}
+            </p>
           )}
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -88,10 +130,14 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* Toggle Login/Signup */}
         <p className="text-center mt-6 text-sm text-gray-600">
           {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setMessage("");
+            }}
             className="text-black font-medium underline"
           >
             {isSignUp ? "Log In" : "Sign Up"}

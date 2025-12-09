@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Map from "@/components/Map";
 import ViewToggle from "@/components/ViewToggle";
 import { getDistanceKm, formatDistance } from "@/lib/distance";
+import { track } from "@/lib/track";
+import { usePageView } from "@/hooks/usePageView";
 
 type Place = {
   id: string;
@@ -35,6 +37,9 @@ export default function DiscoveryView({ places }: Props) {
     lng: number;
   } | null>(null);
 
+  // Track page view
+  usePageView();
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -50,6 +55,20 @@ export default function DiscoveryView({ places }: Props) {
       );
     }
   }, []);
+
+  const handleViewChange = (newView: "map" | "list") => {
+    setView(newView);
+    track({
+      type: newView === "map" ? "map_view" : "list_view",
+    });
+  };
+
+  const handleDirectionClick = (place: Place) => {
+    track({
+      type: "direction_click",
+      placeId: place.id,
+    });
+  };
 
   // Sort places by distance if we have user location
   const sortedPlaces = userLocation
@@ -77,7 +96,7 @@ export default function DiscoveryView({ places }: Props) {
         <h2 className="text-xl font-semibold">
           {places.length} Place{places.length !== 1 && "s"}
         </h2>
-        <ViewToggle view={view} onViewChange={setView} />
+        <ViewToggle view={view} onViewChange={handleViewChange} />
       </div>
 
       {/* Map View */}
@@ -100,7 +119,12 @@ export default function DiscoveryView({ places }: Props) {
               <div key={place.id} className="border p-4 rounded-lg">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold">{place.name}</h3>
+                    <a
+                      href={`/place/${place.id}`}
+                      className="text-lg font-semibold hover:underline"
+                    >
+                      {place.name}
+                    </a>
                     <p className="text-gray-500 text-sm">{place.address}</p>
                   </div>
                   {distance !== null && (
@@ -116,6 +140,7 @@ export default function DiscoveryView({ places }: Props) {
                   href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => handleDirectionClick(place)}
                   className="text-sm text-blue-600 hover:underline inline-block mt-2"
                 >
                   Get directions →

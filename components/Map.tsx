@@ -7,6 +7,7 @@ import {
   AdvancedMarker,
   InfoWindow,
 } from "@vis.gl/react-google-maps";
+import { track } from "@/lib/track";
 
 type Recommendation = {
   id: string;
@@ -51,6 +52,29 @@ export default function Map({
     );
   }
 
+  const handleMarkerClick = (place: Place) => {
+    setSelectedPlace(place);
+    track({
+      type: "marker_click",
+      placeId: place.id,
+    });
+  };
+
+  const handleDirectionClick = (place: Place) => {
+    track({
+      type: "direction_click",
+      placeId: place.id,
+    });
+  };
+
+  const handleVideoClick = (rec: Recommendation, placeId: string) => {
+    track({
+      type: "video_click",
+      placeId,
+      recommendationId: rec.id,
+    });
+  };
+
   return (
     <APIProvider apiKey={apiKey}>
       <div className="w-full h-[400px] rounded-lg overflow-hidden">
@@ -65,7 +89,7 @@ export default function Map({
               key={place.id}
               position={{ lat: place.latitude, lng: place.longitude }}
               title={place.name}
-              onClick={() => setSelectedPlace(place)}
+              onClick={() => handleMarkerClick(place)}
             >
               <div className="w-4 h-4 bg-red-500 border-2 border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-transform" />
             </AdvancedMarker>
@@ -84,12 +108,11 @@ export default function Map({
                   {selectedPlace.name}
                 </h3>
 
-                {/* Get Directions */}
-
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPlace.latitude},${selectedPlace.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => handleDirectionClick(selectedPlace)}
                   className="text-sm text-blue-600 hover:underline inline-block mt-1"
                 >
                   Get directions →
@@ -118,6 +141,9 @@ export default function Map({
                               href={rec.videoUrl}
                               target="_blank"
                               rel="noopener noreferrer"
+                              onClick={() =>
+                                handleVideoClick(rec, selectedPlace.id)
+                              }
                               className="text-sm text-blue-600 hover:underline mt-1 inline-block"
                             >
                               Watch video →

@@ -3,49 +3,63 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-
 model Influencer {
-  id              String   @id @default(cuid())
-  authId          String   @unique
-  username        String   @unique
+  id              String           @id @default(cuid())
+  authId          String           @unique
+  username        String           @unique
   displayName     String
   bio             String?
   profileImage    String?
+  createdAt       DateTime         @default(now())
   instagram       String?
   youtube         String?
-  createdAt       DateTime @default(now())
-  
+  events          Event[]
   recommendations Recommendation[]
 }
+
 model Place {
-  id             String   @id @default(cuid())
-  googlePlaceId  String?  @unique
-  name           String
-  address        String
-  latitude       Float
-  longitude      Float
-  city           String
-  locationNotes  String?
-  category       String   @default("restaurant")
-  createdAt      DateTime @default(now())
-  
+  id              String           @id @default(cuid())
+  googlePlaceId   String?          @unique
+  name            String
+  address         String
+  latitude        Float
+  longitude       Float
+  city            String
+  locationNotes   String?
+  createdAt       DateTime         @default(now())
+  category        String           @default("restaurant")
+  events          Event[]
   recommendations Recommendation[]
 }
+
 model Recommendation {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   dishes       String[]
   videoUrl     String?
-  isSponsored  Boolean  @default(false)
+  isSponsored  Boolean    @default(false)
   notes        String?
-  createdAt    DateTime @default(now())
-  
-  influencer   Influencer @relation(fields: [influencerId], references: [id])
+  createdAt    DateTime   @default(now())
   influencerId String
-  
-  place        Place @relation(fields: [placeId], references: [id])
   placeId      String
+  events       Event[]
+  influencer   Influencer @relation(fields: [influencerId], references: [id])
+  place        Place      @relation(fields: [placeId], references: [id])
+}
+
+model Event {
+  id               String          @id @default(cuid())
+  type             String
+  placeId          String?
+  influencerId     String?
+  sessionId        String
+  metadata         Json?
+  createdAt        DateTime        @default(now())
+  recommendationId String?
+  influencer       Influencer?     @relation(fields: [influencerId], references: [id])
+  place            Place?          @relation(fields: [placeId], references: [id])
+  recommendation   Recommendation? @relation(fields: [recommendationId], references: [id])
 }

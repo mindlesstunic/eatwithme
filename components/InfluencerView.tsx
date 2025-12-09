@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Map from "@/components/Map";
 import ViewToggle from "@/components/ViewToggle";
 import { getDistanceKm, formatDistance } from "@/lib/distance";
+import { track } from "@/lib/track";
 
 type Recommendation = {
   id: string;
@@ -26,6 +27,7 @@ type Recommendation = {
 type Props = {
   recommendations: Recommendation[];
   influencer: {
+    id: string;
     displayName: string;
     username: string;
   };
@@ -53,6 +55,32 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
       );
     }
   }, []);
+
+  const handleViewChange = (newView: "map" | "list") => {
+    setView(newView);
+    track({
+      type: newView === "map" ? "map_view" : "list_view",
+      influencerId: influencer.id,
+    });
+  };
+
+  const handleDirectionClick = (rec: Recommendation) => {
+    track({
+      type: "direction_click",
+      placeId: rec.place.id,
+      influencerId: influencer.id,
+      recommendationId: rec.id,
+    });
+  };
+
+  const handleVideoClick = (rec: Recommendation) => {
+    track({
+      type: "video_click",
+      placeId: rec.place.id,
+      influencerId: influencer.id,
+      recommendationId: rec.id,
+    });
+  };
 
   // Sort by distance if we have user location
   const sortedRecommendations = userLocation
@@ -102,7 +130,7 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
           {recommendations.length} Recommendation
           {recommendations.length !== 1 && "s"}
         </h2>
-        <ViewToggle view={view} onViewChange={setView} />
+        <ViewToggle view={view} onViewChange={handleViewChange} />
       </div>
 
       {/* Map View */}
@@ -125,7 +153,12 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
               <li key={rec.id} className="border p-4 rounded-lg">
                 <div className="flex items-start justify-between">
                   <div>
-                    <strong className="text-lg">{rec.place.name}</strong>
+                    <a
+                      href={`/place/${rec.place.id}`}
+                      className="text-lg font-semibold hover:underline"
+                    >
+                      {rec.place.name}
+                    </a>
                     <p className="text-gray-500 text-sm">{rec.place.address}</p>
                   </div>
                   {distance !== null && (
@@ -136,10 +169,12 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                 </div>
 
                 {/* Get Directions */}
-                
-                <a  href={`https://www.google.com/maps/dir/?api=1&destination=${rec.place.latitude},${rec.place.longitude}`}
+
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${rec.place.latitude},${rec.place.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => handleDirectionClick(rec)}
                   className="text-sm text-blue-600 hover:underline inline-block mt-2"
                 >
                   Get directions →
@@ -149,10 +184,11 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                   Try: {rec.dishes.join(", ")}
                 </p>
                 {rec.videoUrl && (
-                  
-                   <a href={rec.videoUrl}
+                  <a
+                    href={rec.videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => handleVideoClick(rec)}
                     className="text-sm text-blue-600 hover:underline mt-1 inline-block"
                   >
                     Watch video →
