@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import PlaceAutocomplete from "@/components/PlaceAutocomplete";
+import MapPinSelector from "@/components/MapPinSelector";
 
 export default function AddPlacePage() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function AddPlacePage() {
   const [longitude, setLongitude] = useState("");
   const [locationNotes, setLocationNotes] = useState("");
   const [googlePlaceId, setGooglePlaceId] = useState("");
+  const [category, setCategory] = useState("restaurant");
 
   // Recommendation fields
   const [dishes, setDishes] = useState("");
@@ -62,6 +64,7 @@ export default function AddPlacePage() {
           longitude: parseFloat(longitude),
           locationNotes: locationNotes || null,
           googlePlaceId: googlePlaceId || null,
+          category,
         },
         recommendation: {
           dishes: dishes
@@ -106,12 +109,29 @@ export default function AddPlacePage() {
               )}
 
               {placeName && (
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="font-medium">{placeName}</p>
-                  <p className="text-sm text-gray-500">{address}</p>
-                  <p className="text-xs text-gray-400">
-                    {city} • {latitude}, {longitude}
-                  </p>
+                <div className="p-4 bg-gray-50 rounded-lg flex items-start justify-between">
+                  <div>
+                    <p className="font-medium">{placeName}</p>
+                    <p className="text-sm text-gray-500">{address}</p>
+                    <p className="text-xs text-gray-400">
+                      {city} • {latitude}, {longitude}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlaceName("");
+                      setAddress("");
+                      setCity("");
+                      setLatitude("");
+                      setLongitude("");
+                      setGooglePlaceId("");
+                      setLocationNotes("");
+                    }}
+                    className="text-sm text-red-500 hover:text-red-700"
+                  >
+                    Clear
+                  </button>
                 </div>
               )}
 
@@ -139,60 +159,45 @@ export default function AddPlacePage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Address *
-                </label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full p-3 border rounded-lg"
-                  placeholder="RTC X Roads, Hyderabad"
-                  required
-                />
-              </div>
+              <MapPinSelector
+                onLocationSelect={(location) => {
+                  setLatitude(location.latitude.toString());
+                  setLongitude(location.longitude.toString());
+                  setAddress(location.address);
+                  setCity(location.city);
+                }}
+              />
 
-              <div>
-                <label className="block text-sm font-medium mb-1">City *</label>
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full p-3 border rounded-lg"
-                  placeholder="Hyderabad"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Latitude *
-                  </label>
-                  <input
-                    type="text"
-                    value={latitude}
-                    onChange={(e) => setLatitude(e.target.value)}
-                    className="w-full p-3 border rounded-lg"
-                    placeholder="17.4156"
-                    required
-                  />
+              {/* Auto-filled from pin - editable if needed */}
+              {(address || city) && (
+                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full p-2 border rounded-lg text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full p-2 border rounded-lg text-sm"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    {latitude}, {longitude}
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Longitude *
-                  </label>
-                  <input
-                    type="text"
-                    value={longitude}
-                    onChange={(e) => setLongitude(e.target.value)}
-                    className="w-full p-3 border rounded-lg"
-                    placeholder="78.4989"
-                    required
-                  />
-                </div>
-              </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -217,6 +222,19 @@ export default function AddPlacePage() {
             </>
           )}
         </section>
+        {/* Category */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Category</label>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-white"
+          >
+            <option value="street_food">Street Food</option>
+            <option value="casual">Casual</option>
+            <option value="restaurant">Restaurant</option>
+          </select>
+        </div>
 
         {/* Recommendation Details */}
         <section className="space-y-4">

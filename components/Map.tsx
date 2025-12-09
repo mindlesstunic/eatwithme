@@ -45,7 +45,7 @@ export default function Map({
         <GoogleMap
           defaultCenter={center}
           defaultZoom={zoom}
-          mapId="eatwithme-map"
+          mapId={process.env.NEXT_PUBLIC_GOOGLE_MAP_ID}
           onClick={() => setSelectedPlace(null)}
         >
           {places.map((place) => (

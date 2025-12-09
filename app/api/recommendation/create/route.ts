@@ -67,6 +67,7 @@ export async function POST(request: Request) {
           latitude: place.latitude,
           longitude: place.longitude,
           locationNotes: place.locationNotes,
+          category: place.category || "restaurant",
         },
       });
     }
