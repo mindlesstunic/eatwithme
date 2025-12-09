@@ -9,9 +9,10 @@ type Props = {
 export default async function InfluencerPage({ params }: Props) {
   const { username } = await params;
   const decodedUsername = decodeURIComponent(username);
+  const cleanUsername = decodedUsername.replace("@", "");
 
   const influencer = await prisma.influencer.findUnique({
-    where: { username: decodedUsername },
+    where: { username: cleanUsername },
     include: {
       recommendations: {
         include: {

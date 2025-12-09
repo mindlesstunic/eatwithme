@@ -10,10 +10,13 @@ datasource db {
 
 model Influencer {
   id              String   @id @default(cuid())
+  authId          String   @unique
   username        String   @unique
   displayName     String
   bio             String?
   profileImage    String?
+  instagram       String?
+  youtube         String?
   createdAt       DateTime @default(now())
   
   recommendations Recommendation[]
