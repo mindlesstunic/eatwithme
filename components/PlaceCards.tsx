@@ -97,10 +97,6 @@ export default function PlaceCards({
         <div
           ref={scrollContainerRef}
           className="flex gap-3 overflow-x-auto px-4 pb-2 snap-x snap-mandatory scrollbar-hide"
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
         >
           {places.map((place) => {
             const isSelected = place.id === selectedPlaceId;
@@ -210,29 +206,6 @@ export default function PlaceCards({
             );
           })}
         </div>
-
-        {/* ============================================
-            Scroll indicator dots
-            ============================================ */}
-        {places.length > 1 && (
-          <div className="flex justify-center gap-1.5 mt-3">
-            {places.slice(0, 5).map((place) => (
-              <div
-                key={place.id}
-                className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                  place.id === selectedPlaceId
-                    ? "bg-[var(--color-primary)]"
-                    : "bg-[var(--color-border)]"
-                }`}
-              />
-            ))}
-            {places.length > 5 && (
-              <span className="text-xs text-[var(--color-foreground-muted)] ml-1">
-                +{places.length - 5}
-              </span>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

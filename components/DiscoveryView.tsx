@@ -1,6 +1,6 @@
 /**
  * Discovery View Component
- * 
+ *
  * Full-page map view for discovery with toggle to list.
  * Map takes full viewport for immersive browsing.
  */
@@ -118,22 +118,14 @@ export default function DiscoveryView({ places }: Props) {
   if (view === "map") {
     return (
       <div className="relative">
-        {/* Floating Toggle */}
+        {/* Floating Toggle - Top Right */}
         <div className="absolute top-4 right-4 z-30">
           <ViewToggle view={view} onViewChange={handleViewChange} />
         </div>
 
-        {/* Floating Title */}
-        <div className="absolute top-4 left-4 z-30 bg-[var(--color-background)]/90 backdrop-blur-sm px-4 py-2 rounded-[var(--radius-lg)] shadow-md">
-          <h1 className="text-lg font-bold">Discover</h1>
-          <p className="text-sm text-[var(--color-foreground-secondary)]">
-            {places.length} place{places.length !== 1 && "s"}
-          </p>
-        </div>
-
         {/* Full Page Map */}
-        <Map 
-          places={places} 
+        <Map
+          places={places}
           fullHeight={true}
           center={userLocation || undefined}
         />
@@ -173,8 +165,8 @@ export default function DiscoveryView({ places }: Props) {
             <div key={place.id} className="card">
               <div className="flex items-start justify-between">
                 <div>
-                  
-                   <a href={`/place/${place.id}`}
+                  <a
+                    href={`/place/${place.id}`}
                     className="text-lg font-semibold hover:text-[var(--color-primary)] transition-colors"
                   >
                     {place.name}
@@ -190,8 +182,8 @@ export default function DiscoveryView({ places }: Props) {
                 )}
               </div>
 
-              
-               <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => handleDirectionClick(place)}
@@ -207,9 +199,12 @@ export default function DiscoveryView({ places }: Props) {
                 </p>
                 {place.recommendations.map((rec) => (
                   <div key={rec.id} className="mt-2 text-sm">
-                    <span className="font-medium">@{rec.influencer.username}</span>
+                    <span className="font-medium">
+                      @{rec.influencer.username}
+                    </span>
                     <span className="text-[var(--color-foreground-secondary)]">
-                      {" "}— {rec.dishes.join(", ")}
+                      {" "}
+                      — {rec.dishes.join(", ")}
                     </span>
                     {rec.isSponsored && (
                       <span className="badge-sponsored ml-2">Sponsored</span>
