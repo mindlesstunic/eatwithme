@@ -7,7 +7,7 @@ type Props = {
   email: string;
 };
 
-export default function SetupProfile({ userId, email }: Props) {
+export default function SetupProfile({ email }: Props) {
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [instagram, setInstagram] = useState("");
@@ -24,8 +24,7 @@ export default function SetupProfile({ userId, email }: Props) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId,
-        username: `${username}`,
+        username,
         displayName,
         instagram,
         youtube,

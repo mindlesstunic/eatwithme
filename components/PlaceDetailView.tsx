@@ -2,11 +2,12 @@
  * Place Detail View Component
  *
  * Shows all recommendations for a specific place.
- * Handles empty state and tracks user interactions.
+ * Styled with design system, includes back navigation.
  */
 
 "use client";
 
+import { useRouter } from "next/navigation";
 import { track } from "@/lib/track";
 import EmptyState from "@/components/EmptyState";
 
@@ -46,6 +47,8 @@ const categoryLabels: Record<string, string> = {
 };
 
 export default function PlaceDetailView({ place }: Props) {
+  const router = useRouter();
+
   const handleDirectionClick = () => {
     track({
       type: "direction_click",
@@ -62,94 +65,120 @@ export default function PlaceDetailView({ place }: Props) {
     });
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <div>
-      {/* ============================================
-          Header
-          ============================================ */}
+      {/* Back Button */}
+      <button
+        onClick={handleBack}
+        className="flex items-center gap-2 text-[var(--color-foreground-secondary)] hover:text-[var(--color-foreground)] mb-6 transition-colors"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        <span className="text-sm font-medium">Back</span>
+      </button>
+
+      {/* Place Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
           <h1 className="text-3xl font-bold">{place.name}</h1>
-          <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded">
+          <span className="text-sm bg-[var(--color-background-secondary)] text-[var(--color-foreground-secondary)] px-3 py-1 rounded-[var(--radius-sm)]">
             {categoryLabels[place.category] || place.category}
           </span>
         </div>
-        <p className="text-gray-500">{place.address}</p>
-        <p className="text-gray-400 text-sm">{place.city}</p>
+        <p className="text-[var(--color-foreground-secondary)]">
+          {place.address}
+        </p>
+        <p className="text-[var(--color-foreground-muted)] text-sm">
+          {place.city}
+        </p>
         {place.locationNotes && (
-          <p className="text-gray-500 text-sm mt-1 italic">
+          <p className="text-[var(--color-foreground-secondary)] text-sm mt-2 italic">
             📍 {place.locationNotes}
           </p>
         )}
       </div>
 
-      {/* ============================================
-          Get Directions Button
-          ============================================ */}
+      {/* Get Directions Button */}
 
       <a
         href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleDirectionClick}
-        className="inline-block px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 mb-8"
+        className="btn-primary inline-block mb-8"
       >
         Get Directions →
       </a>
 
-      {/* ============================================
-          Recommendations Section
-          ============================================ */}
+      {/* Recommendations Section */}
       <h2 className="text-xl font-semibold mb-4">
         {place.recommendations.length} Recommendation
         {place.recommendations.length !== 1 && "s"}
       </h2>
 
-      {/* ============================================
-          Empty State
-          ============================================ */}
       {place.recommendations.length === 0 ? (
         <EmptyState
-          icon="🤔"
-          title="No recommendations"
-          description="This place doesn't have any recommendations yet."
+          icon="🍜"
+          title="No recommendations yet"
+          description="This place hasn't been recommended by any influencers yet."
         />
       ) : (
-        /* ============================================
-           Recommendation Cards
-           ============================================ */
         <div className="space-y-4">
           {place.recommendations.map((rec) => (
-            <div key={rec.id} className="border p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <a
-                  href={`/@${rec.influencer.username}`}
-                  className="font-medium hover:underline"
-                >
-                  @{rec.influencer.username}
+            <div key={rec.id} className="card">
+              {/* Influencer Info */}
+              <div className="flex items-start justify-between mb-3">
+                <a href={`/@${rec.influencer.username}`} className="group">
+                  <p className="font-semibold group-hover:text-[var(--color-primary)] transition-colors">
+                    {rec.influencer.displayName}
+                  </p>
+                  <p className="text-sm text-[var(--color-foreground-muted)]">
+                    @{rec.influencer.username}
+                  </p>
                 </a>
                 {rec.isSponsored && (
-                  <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">
-                    Sponsored
-                  </span>
+                  <span className="badge-sponsored">Sponsored</span>
                 )}
               </div>
 
-              <p className="text-gray-600">Try: {rec.dishes.join(", ")}</p>
+              {/* Dishes */}
+              <p className="text-[var(--color-foreground-secondary)]">
+                <span className="font-medium text-[var(--color-foreground)]">
+                  Try:
+                </span>{" "}
+                {rec.dishes.join(", ")}
+              </p>
 
+              {/* Notes */}
               {rec.notes && (
-                <p className="text-gray-500 text-sm mt-2 italic">
+                <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
                   "{rec.notes}"
                 </p>
               )}
 
+              {/* Video Link */}
               {rec.videoUrl && (
                 <a
                   href={rec.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => handleVideoClick(rec)}
-                  className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                  className="link text-sm inline-block mt-3"
                 >
                   Watch video →
                 </a>

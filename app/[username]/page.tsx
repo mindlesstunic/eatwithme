@@ -6,10 +6,10 @@
  */
 
 import { prisma } from "@/lib/db";
-import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import InfluencerView from "@/components/InfluencerView";
 import PageViewTracker from "@/components/PageViewTracker";
+import { notFound, redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -74,6 +74,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function InfluencerPage({ params }: Props) {
   const { username } = await params;
   const decodedUsername = decodeURIComponent(username);
+
+  // Redirect to canonical @ URL if missing
+  if (!decodedUsername.startsWith("@")) {
+    redirect(`/@${decodedUsername}`);
+  }
   const cleanUsername = decodedUsername.replace("@", "");
 
   const influencer = await prisma.influencer.findUnique({

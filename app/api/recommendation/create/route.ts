@@ -29,15 +29,34 @@ export async function POST(request: Request) {
     const { place, recommendation } = await request.json();
 
     // Validate input
+    // Validate required fields
     if (
       !place.name ||
       !place.address ||
       !place.city ||
-      !place.latitude ||
-      !place.longitude
+      place.latitude === undefined ||
+      place.longitude === undefined
     ) {
       return NextResponse.json(
         { error: "Missing place details" },
+        { status: 400 }
+      );
+    }
+
+    // Validate coordinates are valid numbers in range
+    const lat = Number(place.latitude);
+    const lng = Number(place.longitude);
+
+    if (
+      isNaN(lat) ||
+      isNaN(lng) ||
+      lat < -90 ||
+      lat > 90 ||
+      lng < -180 ||
+      lng > 180
+    ) {
+      return NextResponse.json(
+        { error: "Invalid coordinates" },
         { status: 400 }
       );
     }
@@ -49,13 +68,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if place already exists (by name and city)
-    let existingPlace = await prisma.place.findFirst({
-      where: {
-        name: place.name,
-        city: place.city,
-      },
-    });
+    // Check if place already exists
+    let existingPlace = null;
+
+    // First, try to find by googlePlaceId (most reliable)
+    if (place.googlePlaceId) {
+      existingPlace = await prisma.place.findUnique({
+        where: { googlePlaceId: place.googlePlaceId },
+      });
+    }
+
+    // Fallback: check by name + city (for manual entries)
+    if (!existingPlace) {
+      existingPlace = await prisma.place.findFirst({
+        where: {
+          name: place.name,
+          city: place.city,
+        },
+      });
+    }
 
     // Create place if it doesn't exist
     if (!existingPlace) {
@@ -64,10 +95,11 @@ export async function POST(request: Request) {
           name: place.name,
           address: place.address,
           city: place.city,
-          latitude: place.latitude,
-          longitude: place.longitude,
+          latitude: lat,
+          longitude: lng,
           locationNotes: place.locationNotes,
           category: place.category || "restaurant",
+          googlePlaceId: place.googlePlaceId || null,
         },
       });
     }
