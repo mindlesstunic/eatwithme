@@ -41,7 +41,6 @@ export default function PlaceAutocomplete({ onPlaceSelect }: Props) {
       const { suggestions } =
         await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
           input: value,
-          includedPrimaryTypes: ["restaurant", "cafe", "food", "bakery"],
         });
 
       setSuggestions(suggestions || []);
