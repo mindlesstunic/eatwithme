@@ -274,7 +274,7 @@ export default function Map({
   };
 
   const heightClass = fullHeight
-    ? "h-[calc(100vh-73px)]"
+    ? "h-[calc(100dvh-73px)]"
     : "h-[500px] sm:h-[600px]";
 
   return (
