@@ -123,7 +123,7 @@ export default function DiscoveryView({ places }: Props) {
   // ============================================
   if (view === "map") {
     return (
-      <div className="relative">
+      <div className="relative h-[calc(100vh-73px)] overflow-hidden">
         {/* Floating Toggle - Top Right */}
         <div className="absolute top-4 right-4 z-30">
           <ViewToggle view={view} onViewChange={handleViewChange} />

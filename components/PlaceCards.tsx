@@ -1,6 +1,6 @@
 /**
  * Place Cards Component
- * 
+ *
  * Horizontal swipeable cards that overlay the bottom of the map.
  * Two modes:
  * - discovery: Shows place with all unique dishes from all influencers
@@ -11,6 +11,7 @@
 
 import { useEffect, useRef } from "react";
 import { track } from "@/lib/track";
+import { getDistanceKm, formatDistance } from "@/lib/distance";
 
 type Recommendation = {
   id: string;
@@ -38,13 +39,15 @@ type Props = {
   selectedPlaceId: string | null;
   onPlaceSelect: (placeId: string) => void;
   mode?: "discovery" | "influencer";
+  userLocation?: { lat: number; lng: number } | null;
 };
 
-export default function PlaceCards({ 
-  places, 
-  selectedPlaceId, 
+export default function PlaceCards({
+  places,
+  selectedPlaceId,
   onPlaceSelect,
   mode = "discovery",
+  userLocation = null,
 }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
@@ -101,6 +104,16 @@ export default function PlaceCards({
             const isSelected = place.id === selectedPlaceId;
             const firstRec = place.recommendations?.[0];
 
+            // Calculate distance if user location available
+            const distance = userLocation
+              ? getDistanceKm(
+                  userLocation.lat,
+                  userLocation.lng,
+                  place.latitude,
+                  place.longitude
+                )
+              : null;
+
             return (
               <div
                 key={place.id}
@@ -111,25 +124,34 @@ export default function PlaceCards({
                 className={`
                   flex-shrink-0 w-[280px] sm:w-[320px] p-4 rounded-[var(--radius-lg)] 
                   snap-center cursor-pointer transition-all duration-200
-                  ${isSelected 
-                    ? "bg-[var(--color-primary-light)] border-2 border-[var(--color-primary)]" 
-                    : "bg-[var(--color-background)] border border-[var(--color-border)] hover:border-[var(--color-primary)]"
+                  flex flex-col h-[200px]
+                  ${
+                    isSelected
+                      ? "bg-[var(--color-primary-light)] border-2 border-[var(--color-primary)]"
+                      : "bg-[var(--color-background)] border border-[var(--color-border)] hover:border-[var(--color-primary)]"
                   }
                 `}
               >
                 {/* ============================================
-                    Place Header
+                    Place Header - Top
                     ============================================ */}
                 <div className="mb-2">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-semibold text-base line-clamp-1">
                       {place.name}
                     </h3>
-                    {mode === "influencer" && firstRec?.isSponsored && (
-                      <span className="badge-sponsored text-xs flex-shrink-0">
-                        Sponsored
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {mode === "influencer" && firstRec?.isSponsored && (
+                        <span className="badge-sponsored text-xs">
+                          Sponsored
+                        </span>
+                      )}
+                      {distance !== null && (
+                        <span className="text-xs text-[var(--color-foreground-muted)] whitespace-nowrap">
+                          {formatDistance(distance)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-sm text-[var(--color-foreground-secondary)] line-clamp-1">
                     {place.address}
@@ -137,48 +159,57 @@ export default function PlaceCards({
                 </div>
 
                 {/* ============================================
-                    Content - varies by mode
+                    Content - Middle (flex-grow to push buttons down)
                     ============================================ */}
-                {mode === "discovery" ? (
-                  // Discovery mode: Show unique dishes from all influencers
-                  <div className="mb-3">
-                    {place.recommendations && place.recommendations.length > 0 && (
-                      <p className="text-sm text-[var(--color-foreground-secondary)] line-clamp-2">
-                        <span className="font-medium text-[var(--color-foreground)]">Try:</span>{" "}
-                        {getUniqueDishes(place.recommendations).join(", ")}
-                      </p>
-                    )}
-                    {place.recommendations && place.recommendations.length > 1 && (
-                      <p className="text-xs text-[var(--color-foreground-muted)] mt-2">
-                        Recommended by {place.recommendations.length} influencers
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  // Influencer mode: Show that influencer's dishes + notes
-                  <div className="mb-3">
-                    {firstRec && (
-                      <>
-                        <p className="text-sm text-[var(--color-foreground-secondary)] line-clamp-2">
-                          <span className="font-medium text-[var(--color-foreground)]">Try:</span>{" "}
-                          {firstRec.dishes.join(", ")}
-                        </p>
-                        {firstRec.notes && (
-                          <p className="text-xs text-[var(--color-foreground-muted)] mt-2 italic line-clamp-2">
-                            "{firstRec.notes}"
+                <div className="flex-grow">
+                  {mode === "discovery" ? (
+                    // Discovery mode: Show unique dishes from all influencers
+                    <div>
+                      {place.recommendations &&
+                        place.recommendations.length > 0 && (
+                          <p className="text-sm text-[var(--color-foreground-secondary)] line-clamp-1">
+                            <span className="font-medium text-[var(--color-foreground)]">
+                              Try:
+                            </span>{" "}
+                            {getUniqueDishes(place.recommendations).join(", ")}
                           </p>
                         )}
-                      </>
-                    )}
-                  </div>
-                )}
+                      {place.recommendations &&
+                        place.recommendations.length > 1 && (
+                          <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
+                            Recommended by {place.recommendations.length}{" "}
+                            influencers
+                          </p>
+                        )}
+                    </div>
+                  ) : (
+                    // Influencer mode: Show that influencer's dishes + notes
+                    <div>
+                      {firstRec && (
+                        <>
+                          <p className="text-sm text-[var(--color-foreground-secondary)] line-clamp-1">
+                            <span className="font-medium text-[var(--color-foreground)]">
+                              Try:
+                            </span>{" "}
+                            {firstRec.dishes.join(", ")}
+                          </p>
+                          {firstRec.notes && (
+                            <p className="text-xs text-[var(--color-foreground-muted)] mt-1 italic line-clamp-1">
+                              "{firstRec.notes}"
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* ============================================
-                    Actions
+                    Actions - Bottom (always at bottom)
                     ============================================ */}
-                <div className="flex gap-2 mt-auto">
-                  
-                   <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
+                <div className="flex gap-2 mt-3">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => {
@@ -189,8 +220,9 @@ export default function PlaceCards({
                   >
                     Directions
                   </a>
-                  
-                   <a href={`/place/${place.id}`}
+
+                  <a
+                    href={`/place/${place.id}`}
                     onClick={(e) => e.stopPropagation()}
                     className="btn-secondary text-sm py-2 px-3"
                   >

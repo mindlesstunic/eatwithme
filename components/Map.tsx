@@ -1,6 +1,6 @@
 /**
  * Map Component
- * 
+ *
  * Full-page map with markers and swipeable bottom cards.
  * Supports discovery and influencer modes for different card layouts.
  */
@@ -214,9 +214,15 @@ export default function Map({
 }: MapProps) {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [locating, setLocating] = useState(false);
-  const [centerTarget, setCenterTarget] = useState<{ lat: number; lng: number } | null>(null);
+  const [centerTarget, setCenterTarget] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [showUserMarker, setShowUserMarker] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -318,6 +324,7 @@ export default function Map({
           selectedPlaceId={selectedPlaceId}
           onPlaceSelect={handleCardSelect}
           mode={mode}
+          userLocation={userLocation}
         />
       </div>
     </APIProvider>
