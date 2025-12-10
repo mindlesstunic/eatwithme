@@ -9,7 +9,12 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import EditProfileForm from "./EditProfileForm";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Edit Profile",
+  description: "Update your EatWithMe profile information.",
+};
 export default async function EditProfilePage() {
   // ============================================
   // 1. Verify authentication

@@ -11,6 +11,12 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login",
+  description: "Sign in to EatWithMe to manage your food recommendations.",
+};
 
 export default function LoginPage() {
   const searchParams = useSearchParams();

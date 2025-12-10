@@ -11,6 +11,12 @@ import { redirect } from "next/navigation";
 import SetupProfile from "./SetupProfile";
 import Link from "next/link";
 import RecommendationCard from "./RecommendationCard";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Manage your food recommendations on EatWithMe.",
+};
 
 export default async function DashboardPage() {
   // ============================================

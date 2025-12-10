@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import PlaceAutocomplete from "@/components/PlaceAutocomplete";
 import MapPinSelector from "@/components/MapPinSelector";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Add Place",
+  description: "Add a new food recommendation to your EatWithMe profile.",
+};
 
 export default function AddPlacePage() {
   const router = useRouter();
