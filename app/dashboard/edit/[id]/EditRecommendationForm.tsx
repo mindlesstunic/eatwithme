@@ -81,9 +81,11 @@ export default function EditRecommendationForm({ recommendation }: Props) {
       {/* ============================================
           Place Info (Read-only)
           ============================================ */}
-      <div className="p-4 bg-gray-50 rounded-lg">
+      <div className="p-4 bg-[var(--color-background-secondary)] rounded-lg">
         <p className="font-medium">{recommendation.place.name}</p>
-        <p className="text-sm text-gray-500">{recommendation.place.address}</p>
+        <p className="text-sm text-[var(--color-foreground-secondary)]">
+          {recommendation.place.address}
+        </p>
       </div>
 
       {/* ============================================
@@ -101,7 +103,7 @@ export default function EditRecommendationForm({ recommendation }: Props) {
           placeholder="Butter Chicken, Garlic Naan, Mango Lassi"
           required
         />
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
           Separate multiple dishes with commas
         </p>
       </div>
@@ -153,7 +155,7 @@ export default function EditRecommendationForm({ recommendation }: Props) {
       {/* ============================================
           Error Message
           ============================================ */}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
 
       {/* ============================================
           Action Buttons
@@ -162,14 +164,14 @@ export default function EditRecommendationForm({ recommendation }: Props) {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 p-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
+          className="flex-1 p-3 btn-primary rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>
         <button
           type="button"
           onClick={() => router.push("/dashboard")}
-          className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-50"
+          className="px-6 py-3 border rounded-lg font-medium hover:bg-[var(--color-background-secondary)]"
         >
           Cancel
         </button>

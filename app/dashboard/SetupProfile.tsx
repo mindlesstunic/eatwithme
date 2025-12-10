@@ -48,7 +48,7 @@ export default function SetupProfile({ email }: Props) {
         <h1 className="text-3xl font-bold text-center mb-2">
           Set Up Your Profile
         </h1>
-        <p className="text-gray-500 text-center mb-8">
+        <p className="text-[var(--color-foreground-secondary)] text-center mb-8">
           Choose your username to get started
         </p>
 
@@ -56,7 +56,9 @@ export default function SetupProfile({ email }: Props) {
           <div>
             <label className="block text-sm font-medium mb-1">Username</label>
             <div className="flex items-center border rounded-lg overflow-hidden">
-              <span className="bg-gray-100 px-3 py-3 text-gray-500">@</span>
+              <span className="bg-gray-100 px-3 py-3 text-[var(--color-foreground-secondary)]">
+                @
+              </span>
               <input
                 type="text"
                 value={username}
@@ -70,7 +72,7 @@ export default function SetupProfile({ email }: Props) {
                 required
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
               eatwithme.app/@{username || "username"}
             </p>
           </div>
@@ -94,7 +96,9 @@ export default function SetupProfile({ email }: Props) {
               Instagram Handle
             </label>
             <div className="flex items-center border rounded-lg overflow-hidden">
-              <span className="bg-gray-100 px-3 py-3 text-gray-500">@</span>
+              <span className="bg-gray-100 px-3 py-3 text-[var(--color-foreground-secondary)]">
+                @
+              </span>
               <input
                 type="text"
                 value={instagram}
@@ -118,12 +122,14 @@ export default function SetupProfile({ email }: Props) {
             />
           </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="text-sm text-[var(--color-error)]">{error}</p>
+          )}
 
           <button
             type="submit"
             disabled={loading || !username || !displayName}
-            className="w-full p-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
+            className="w-full p-3 btn-primary rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create Profile"}
           </button>

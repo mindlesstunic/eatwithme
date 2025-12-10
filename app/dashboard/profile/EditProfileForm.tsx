@@ -84,16 +84,20 @@ export default function EditProfileForm({ influencer }: Props) {
           ============================================ */}
       <div>
         <label className="block text-sm font-medium mb-1">Username</label>
-        <div className="flex items-center border rounded-lg overflow-hidden bg-gray-50">
-          <span className="bg-gray-100 px-3 py-3 text-gray-500">@</span>
+        <div className="flex items-center border rounded-lg overflow-hidden bg-[var(--color-background-secondary)]">
+          <span className="bg-gray-100 px-3 py-3 text-[var(--color-foreground-secondary)]">
+            @
+          </span>
           <input
             type="text"
             value={influencer.username}
             disabled
-            className="flex-1 p-3 bg-gray-50 text-gray-500 cursor-not-allowed"
+            className="flex-1 p-3 bg-[var(--color-background-secondary)] text-[var(--color-foreground-secondary)] cursor-not-allowed"
           />
         </div>
-        <p className="text-xs text-gray-400 mt-1">Username cannot be changed</p>
+        <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
+          Username cannot be changed
+        </p>
       </div>
 
       {/* ============================================
@@ -133,7 +137,9 @@ export default function EditProfileForm({ influencer }: Props) {
           Instagram Handle
         </label>
         <div className="flex items-center border rounded-lg overflow-hidden">
-          <span className="bg-gray-100 px-3 py-3 text-gray-500">@</span>
+          <span className="bg-gray-100 px-3 py-3 text-[var(--color-foreground-secondary)]">
+            @
+          </span>
           <input
             type="text"
             value={instagram}
@@ -163,7 +169,7 @@ export default function EditProfileForm({ influencer }: Props) {
       {/* ============================================
           Error Message
           ============================================ */}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
 
       {/* ============================================
           Success Message
@@ -181,14 +187,14 @@ export default function EditProfileForm({ influencer }: Props) {
         <button
           type="submit"
           disabled={loading || !displayName.trim()}
-          className="flex-1 p-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
+          className="flex-1 p-3 btn-primary rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>
         <button
           type="button"
           onClick={() => router.push("/dashboard")}
-          className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-50"
+          className="px-6 py-3 border rounded-lg font-medium hover:bg-[var(--color-background-secondary)]"
         >
           Cancel
         </button>

@@ -109,11 +109,13 @@ export default function AddPlacePage() {
               )}
 
               {placeName && (
-                <div className="p-4 bg-gray-50 rounded-lg flex items-start justify-between">
+                <div className="p-4 bg-[var(--color-background-secondary)] rounded-lg flex items-start justify-between">
                   <div>
                     <p className="font-medium">{placeName}</p>
-                    <p className="text-sm text-gray-500">{address}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-[var(--color-foreground-secondary)]">
+                      {address}
+                    </p>
+                    <p className="text-xs text-[var(--color-foreground-muted)]">
                       {city} • {latitude}, {longitude}
                     </p>
                   </div>
@@ -138,7 +140,7 @@ export default function AddPlacePage() {
               <button
                 type="button"
                 onClick={() => setManualEntry(true)}
-                className="text-sm text-gray-500 underline"
+                className="text-sm text-[var(--color-foreground-secondary)] underline"
               >
                 Can't find it? Enter manually
               </button>
@@ -170,9 +172,9 @@ export default function AddPlacePage() {
 
               {/* Auto-filled from pin - editable if needed */}
               {(address || city) && (
-                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                <div className="p-4 bg-[var(--color-background-secondary)] rounded-lg space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
+                    <label className="block text-xs text-[var(--color-foreground-secondary)] mb-1">
                       Address
                     </label>
                     <input
@@ -183,7 +185,7 @@ export default function AddPlacePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
+                    <label className="block text-xs text-[var(--color-foreground-secondary)] mb-1">
                       City
                     </label>
                     <input
@@ -193,7 +195,7 @@ export default function AddPlacePage() {
                       className="w-full p-2 border rounded-lg text-sm"
                     />
                   </div>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-[var(--color-foreground-muted)]">
                     {latitude}, {longitude}
                   </p>
                 </div>
@@ -215,7 +217,7 @@ export default function AddPlacePage() {
               <button
                 type="button"
                 onClick={() => setManualEntry(false)}
-                className="text-sm text-gray-500 underline"
+                className="text-sm text-[var(--color-foreground-secondary)] underline"
               >
                 ← Back to search
               </button>
@@ -252,7 +254,7 @@ export default function AddPlacePage() {
               placeholder="Biryani, Haleem, Double Ka Meetha"
               required
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
               Separate multiple dishes with commas
             </p>
           </div>
@@ -293,20 +295,20 @@ export default function AddPlacePage() {
           </div>
         </section>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
 
         <div className="flex gap-4">
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-50"
+            className="px-6 py-3 border rounded-lg font-medium hover:bg-[var(--color-background-secondary)]"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading || !placeName || !dishes}
-            className="flex-1 p-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
+            className="flex-1 p-3 btn-primary rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50"
           >
             {loading ? "Adding..." : "Add Place"}
           </button>

@@ -66,7 +66,7 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold">
             Welcome, {influencer.displayName}!
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-[var(--color-foreground-secondary)] mt-2">
             Your page:{" "}
             <a href={`/@${influencer.username}`} className="underline">
               eatwithme.app/@{influencer.username}
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
         {/* Edit Profile Link */}
         <Link
           href="/dashboard/profile"
-          className="text-sm text-gray-500 hover:text-black hover:underline"
+          className="text-sm text-[var(--color-foreground-secondary)] hover:text-black hover:underline"
         >
           Edit Profile
         </Link>
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
           </h2>
           <Link
             href="/dashboard/add-place"
-            className="px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800"
+            className="px-4 py-2 btn-primary rounded-lg font-medium hover:bg-gray-800"
           >
             + Add Place
           </Link>
@@ -100,12 +100,12 @@ export default async function DashboardPage() {
         {/* Empty State */}
         {influencer.recommendations.length === 0 ? (
           <div className="border-2 border-dashed rounded-lg p-8 text-center">
-            <p className="text-gray-500 mb-4">
+            <p className="text-[var(--color-foreground-secondary)] mb-4">
               No recommendations yet. Add your first place!
             </p>
             <Link
               href="/dashboard/add-place"
-              className="inline-block px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800"
+              className="inline-block px-4 py-2 btn-primary rounded-lg font-medium hover:bg-gray-800"
             >
               + Add Place
             </Link>

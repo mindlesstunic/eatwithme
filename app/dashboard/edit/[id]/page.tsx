@@ -64,7 +64,9 @@ export default async function EditRecommendationPage({ params }: Props) {
   return (
     <main className="p-6 max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold mb-2">Edit Recommendation</h1>
-      <p className="text-gray-500 mb-8">{recommendation.place.name}</p>
+      <p className="text-[var(--color-foreground-secondary)] mb-8">
+        {recommendation.place.name}
+      </p>
 
       <EditRecommendationForm recommendation={recommendation} />
     </main>
