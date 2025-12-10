@@ -1,8 +1,8 @@
 /**
  * Discovery View Component
  *
- * Full-page map view for discovery with toggle to list.
- * Map takes full viewport for immersive browsing.
+ * Full-page map view for discovery.
+ * Cards show aggregated dishes from all influencers.
  */
 
 "use client";
@@ -95,6 +95,12 @@ export default function DiscoveryView({ places }: Props) {
       })
     : places;
 
+  // Get unique dishes for a place
+  const getUniqueDishes = (place: Place) => {
+    const allDishes = place.recommendations.flatMap((rec) => rec.dishes);
+    return [...new Set(allDishes)];
+  };
+
   // ============================================
   // Empty State
   // ============================================
@@ -113,7 +119,7 @@ export default function DiscoveryView({ places }: Props) {
   }
 
   // ============================================
-  // Map View - Full Page
+  // Map View
   // ============================================
   if (view === "map") {
     return (
@@ -128,6 +134,7 @@ export default function DiscoveryView({ places }: Props) {
           places={places}
           fullHeight={true}
           center={userLocation || undefined}
+          mode="discovery"
         />
       </div>
     );
@@ -192,26 +199,18 @@ export default function DiscoveryView({ places }: Props) {
                 Get directions →
               </a>
 
-              <div className="mt-3 pt-3 border-t border-[var(--color-border)]">
-                <p className="text-sm text-[var(--color-foreground-secondary)]">
-                  Recommended by {place.recommendations.length} influencer
-                  {place.recommendations.length !== 1 && "s"}
+              <p className="text-[var(--color-foreground-secondary)] mt-3">
+                <span className="font-medium text-[var(--color-foreground)]">
+                  Try:
+                </span>{" "}
+                {getUniqueDishes(place).join(", ")}
+              </p>
+
+              {place.recommendations.length > 1 && (
+                <p className="text-xs text-[var(--color-foreground-muted)] mt-2">
+                  Recommended by {place.recommendations.length} influencers
                 </p>
-                {place.recommendations.map((rec) => (
-                  <div key={rec.id} className="mt-2 text-sm">
-                    <span className="font-medium">
-                      @{rec.influencer.username}
-                    </span>
-                    <span className="text-[var(--color-foreground-secondary)]">
-                      {" "}
-                      — {rec.dishes.join(", ")}
-                    </span>
-                    {rec.isSponsored && (
-                      <span className="badge-sponsored ml-2">Sponsored</span>
-                    )}
-                  </div>
-                ))}
-              </div>
+              )}
             </div>
           );
         })}

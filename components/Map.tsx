@@ -1,8 +1,8 @@
 /**
  * Map Component
- *
+ * 
  * Full-page map with markers and swipeable bottom cards.
- * Includes custom current location button and map type toggle.
+ * Supports discovery and influencer modes for different card layouts.
  */
 
 "use client";
@@ -23,6 +23,7 @@ type Recommendation = {
   dishes: string[];
   videoUrl?: string | null;
   isSponsored: boolean;
+  notes?: string | null;
   influencer: {
     displayName: string;
     username: string;
@@ -43,6 +44,7 @@ type MapProps = {
   zoom?: number;
   places?: Place[];
   fullHeight?: boolean;
+  mode?: "discovery" | "influencer";
 };
 
 // ============================================
@@ -63,9 +65,6 @@ function MapContent({
 }) {
   const map = useMap();
 
-  // ============================================
-  // Pan map to selected place
-  // ============================================
   useEffect(() => {
     if (map && selectedPlaceId) {
       const place = places.find((p) => p.id === selectedPlaceId);
@@ -75,9 +74,6 @@ function MapContent({
     }
   }, [map, selectedPlaceId, places]);
 
-  // ============================================
-  // Handle marker click
-  // ============================================
   const handleMarkerClick = (place: Place) => {
     setSelectedPlaceId(place.id);
     track({
@@ -128,7 +124,7 @@ function MapContent({
 }
 
 // ============================================
-// Current Location Button Component
+// Current Location Button
 // ============================================
 function CurrentLocationButton({
   onLocate,
@@ -184,7 +180,7 @@ function CurrentLocationButton({
 }
 
 // ============================================
-// Map Controller - handles location centering
+// Map Controller
 // ============================================
 function MapController({
   targetLocation,
@@ -214,34 +210,23 @@ export default function Map({
   zoom = 12,
   places = [],
   fullHeight = false,
+  mode = "discovery",
 }: MapProps) {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
-  const [centerTarget, setCenterTarget] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [centerTarget, setCenterTarget] = useState<{ lat: number; lng: number } | null>(null);
   const [showUserMarker, setShowUserMarker] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  // ============================================
-  // Auto-select first place on load
-  // ============================================
   useEffect(() => {
     if (places.length > 0 && !selectedPlaceId) {
       setSelectedPlaceId(places[0].id);
     }
   }, [places, selectedPlaceId]);
 
-  // ============================================
-  // Handle current location button
-  // ============================================
   const handleLocate = () => {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -327,11 +312,12 @@ export default function Map({
           <CurrentLocationButton onLocate={handleLocate} loading={locating} />
         </div>
 
-        {/* Place Cards Overlay */}
+        {/* Place Cards */}
         <PlaceCards
           places={places}
           selectedPlaceId={selectedPlaceId}
           onPlaceSelect={handleCardSelect}
+          mode={mode}
         />
       </div>
     </APIProvider>
