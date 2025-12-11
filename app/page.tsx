@@ -20,6 +20,10 @@ export default async function Home() {
       },
     },
   });
+  const placesWithArea = places.map((place) => ({
+    ...place,
+    area: place.area ?? undefined,
+  }));
 
-  return <DiscoveryView places={places} />;
+  return <DiscoveryView places={placesWithArea} />;
 }

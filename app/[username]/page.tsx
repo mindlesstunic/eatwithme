@@ -99,6 +99,10 @@ export default async function InfluencerPage({ params }: Props) {
   const recommendationsWithInfluencer = influencer.recommendations.map(
     (rec) => ({
       ...rec,
+      place: {
+        ...rec.place,
+        area: rec.place.area ?? undefined,
+      },
       influencer: {
         id: influencer.id,
         displayName: influencer.displayName,
