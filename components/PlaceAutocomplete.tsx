@@ -24,6 +24,26 @@ export default function PlaceAutocomplete({ onPlaceSelect }: Props) {
   >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log("Geolocation error:", error.message);
+        }
+      );
+    }
+  }, []);
 
   const places = useMapsLibrary("places");
 
@@ -42,6 +62,12 @@ export default function PlaceAutocomplete({ onPlaceSelect }: Props) {
       const { suggestions } =
         await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
           input: value,
+          ...(userLocation && {
+            locationBias: {
+              center: userLocation,
+              radius: 100000, // 100km - wider radius
+            },
+          }),
         });
 
       setSuggestions(suggestions || []);

@@ -9,7 +9,7 @@
 
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { track } from "@/lib/track";
 import { getDistanceKm, formatDistance } from "@/lib/distance";
 
@@ -52,10 +52,47 @@ export default function PlaceCards({
 }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const [isReady, setIsReady] = useState(false);
 
-  // ============================================
+  // Sort places by distance if user location available
+  const sortedPlaces = userLocation
+    ? [...places].sort((a, b) => {
+        const distA = getDistanceKm(
+          userLocation.lat,
+          userLocation.lng,
+          a.latitude,
+          a.longitude
+        );
+        const distB = getDistanceKm(
+          userLocation.lat,
+          userLocation.lng,
+          b.latitude,
+          b.longitude
+        );
+        return distA - distB;
+      })
+    : places;
+
+  // Wait for location before showing cards
+  useEffect(() => {
+    if (userLocation) {
+      setIsReady(true);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setIsReady(true);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [userLocation]);
+
+  // Select first card once ready
+  useEffect(() => {
+    if (isReady && sortedPlaces.length > 0) {
+      onPlaceSelect(sortedPlaces[0].id);
+    }
+  }, [isReady]);
+
   // Scroll to selected card when marker is tapped
-  // ============================================
   useEffect(() => {
     if (selectedPlaceId && scrollContainerRef.current) {
       const cardElement = cardRefs.current.get(selectedPlaceId);
@@ -69,8 +106,50 @@ export default function PlaceCards({
     }
   }, [selectedPlaceId]);
 
+  // Auto-select card when scroll stops
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || sortedPlaces.length === 0) return;
+
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScrollEnd = () => {
+      const containerRect = container.getBoundingClientRect();
+      const containerCenter = containerRect.left + containerRect.width / 2;
+
+      let closestPlace: string | null = null;
+      let closestDistance = Infinity;
+
+      cardRefs.current.forEach((card, placeId) => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        const distance = Math.abs(containerCenter - cardCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestPlace = placeId;
+        }
+      });
+
+      if (closestPlace && closestPlace !== selectedPlaceId) {
+        onPlaceSelect(closestPlace);
+      }
+    };
+
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(handleScrollEnd, 150);
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [sortedPlaces, selectedPlaceId, onPlaceSelect]);
+
   // ============================================
-  // Track direction clicks
+  // Helper functions
   // ============================================
   const handleDirectionClick = (place: Place) => {
     track({
@@ -79,17 +158,29 @@ export default function PlaceCards({
     });
   };
 
-  if (places.length === 0) return null;
-
-  // ============================================
-  // Get unique dishes from all recommendations
-  // ============================================
   const getUniqueDishes = (recommendations: Recommendation[] | undefined) => {
     if (!recommendations || recommendations.length === 0) return [];
     const allDishes = recommendations.flatMap((rec) => rec.dishes);
     return [...new Set(allDishes)];
   };
 
+  // ============================================
+  // Early returns AFTER all hooks
+  // ============================================
+  if (places.length === 0) return null;
+
+  if (!isReady) {
+    return (
+      <div className="absolute bottom-0 left-0 right-0 z-10">
+        <div className="h-8 bg-gradient-to-t from-[var(--color-background)] to-transparent" />
+        <div className="bg-[var(--color-background)] pb-4 px-4 h-[200px]" />
+      </div>
+    );
+  }
+
+  // ============================================
+  // Main return
+  // ============================================
   return (
     <div className="absolute bottom-0 left-0 right-0 z-10">
       {/* Gradient fade */}
@@ -101,7 +192,7 @@ export default function PlaceCards({
           ref={scrollContainerRef}
           className="flex gap-3 overflow-x-auto px-4 pb-2 snap-x snap-mandatory scrollbar-hide"
         >
-          {places.map((place) => {
+          {sortedPlaces.map((place) => {
             const isSelected = place.id === selectedPlaceId;
             const firstRec = place.recommendations?.[0];
 
@@ -118,6 +209,7 @@ export default function PlaceCards({
             return (
               <div
                 key={place.id}
+                data-place-id={place.id}
                 ref={(el) => {
                   if (el) cardRefs.current.set(place.id, el);
                 }}
