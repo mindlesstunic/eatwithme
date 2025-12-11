@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { track } from "@/lib/track";
 import EmptyState from "@/components/EmptyState";
 
@@ -50,6 +50,29 @@ const categoryLabels: Record<string, string> = {
 
 export default function PlaceDetailView({ place }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromUsername = searchParams.get("from");
+
+  // Sort recommendations - prioritize the "from" influencer
+  const sortedRecommendations = [...place.recommendations].sort((a, b) => {
+    if (fromUsername) {
+      if (a.influencer.username === fromUsername) return -1;
+      if (b.influencer.username === fromUsername) return 1;
+    }
+    return 0;
+  });
+
+  // Split into featured (from influencer) and others
+  const featuredRec = fromUsername
+    ? sortedRecommendations.find(
+        (rec) => rec.influencer.username === fromUsername
+      )
+    : null;
+  const otherRecs = fromUsername
+    ? sortedRecommendations.filter(
+        (rec) => rec.influencer.username !== fromUsername
+      )
+    : sortedRecommendations;
 
   const handleDirectionClick = () => {
     track({
@@ -127,78 +150,157 @@ export default function PlaceDetailView({ place }: Props) {
         Get Directions →
       </a>
 
-      {/* Recommendations Section */}
-      <h2 className="text-xl font-semibold mb-4">
-        {place.recommendations.length} Recommendation
-        {place.recommendations.length !== 1 && "s"}
-      </h2>
+      {/* Featured recommendation from the influencer user came from */}
+      {featuredRec && (
+        <>
+          <h2 className="text-xl font-semibold mb-4">
+            From @{featuredRec.influencer.username}
+          </h2>
 
-      {place.recommendations.length === 0 ? (
-        <EmptyState
-          icon="🍜"
-          title="No recommendations yet"
-          description="This place hasn't been recommended by any influencers yet."
-        />
-      ) : (
-        <div className="space-y-4">
-          {place.recommendations.map((rec) => (
-            <div key={rec.id} className="card">
-              {/* Influencer Info */}
-              <div className="flex items-start justify-between mb-3">
-                <a href={`/@${rec.influencer.username}`} className="group">
-                  <p className="font-semibold group-hover:text-[var(--color-primary)] transition-colors">
-                    {rec.influencer.displayName}
-                  </p>
-                  <p className="text-sm text-[var(--color-foreground-muted)]">
-                    @{rec.influencer.username}
-                  </p>
-                </a>
-                {rec.hasOffer && <span className="badge-offer">🎁 Offer</span>}
-              </div>
-
-              {/* Dishes */}
-              <p className="text-[var(--color-foreground-secondary)]">
-                <span className="font-medium text-[var(--color-foreground)]">
-                  Try:
-                </span>{" "}
-                {rec.dishes.join(", ")}
-              </p>
-
-              {/* Notes */}
-              {rec.notes && (
-                <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
-                  "{rec.notes}"
+          <div className="card mb-6 border-[var(--color-primary)] border-2">
+            <div className="flex items-start justify-between mb-3">
+              <a
+                href={`/@${featuredRec.influencer.username}`}
+                className="group"
+              >
+                <p className="font-semibold group-hover:text-[var(--color-primary)] transition-colors">
+                  {featuredRec.influencer.displayName}
                 </p>
-              )}
-              {rec.hasOffer && rec.offerDetails && (
-                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <p className="text-sm text-green-800 dark:text-green-200">
-                    <span className="font-medium">🎁 Offer:</span>{" "}
-                    {rec.offerDetails}
-                  </p>
-                  {rec.offerExpiry && (
-                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                      Expires: {new Date(rec.offerExpiry).toLocaleDateString('en-GB')}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Video Link */}
-              {rec.videoUrl && (
-                <a
-                  href={rec.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => handleVideoClick(rec)}
-                  className="link text-sm inline-block mt-3"
-                >
-                  Watch video →
-                </a>
+                <p className="text-sm text-[var(--color-foreground-muted)]">
+                  @{featuredRec.influencer.username}
+                </p>
+              </a>
+              {featuredRec.hasOffer && (
+                <span className="badge-offer">🎁 Offer</span>
               )}
             </div>
-          ))}
-        </div>
+
+            <p className="text-[var(--color-foreground-secondary)]">
+              <span className="font-medium text-[var(--color-foreground)]">
+                Try:
+              </span>{" "}
+              {featuredRec.dishes.join(", ")}
+            </p>
+
+            {featuredRec.notes && (
+              <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
+                "{featuredRec.notes}"
+              </p>
+            )}
+
+            {featuredRec.hasOffer && featuredRec.offerDetails && (
+              <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-sm text-green-800 dark:text-green-200">
+                  <span className="font-medium">🎁 Offer:</span>{" "}
+                  {featuredRec.offerDetails}
+                </p>
+                {featuredRec.offerExpiry && (
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                    Expires:{" "}
+                    {new Date(featuredRec.offerExpiry).toLocaleDateString(
+                      "en-GB"
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {featuredRec.videoUrl && (
+              <a
+                href={featuredRec.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleVideoClick(featuredRec)}
+                className="link text-sm inline-block mt-3"
+              >
+                Watch video →
+              </a>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Other recommendations */}
+      {otherRecs.length > 0 ? (
+        <>
+          <h2 className="text-xl font-semibold mb-4">
+            {featuredRec
+              ? `Also recommended by ${otherRecs.length} other${
+                  otherRecs.length !== 1 ? "s" : ""
+                }`
+              : `${otherRecs.length} Recommendation${
+                  otherRecs.length !== 1 ? "s" : ""
+                }`}
+          </h2>
+
+          <div className="space-y-4">
+            {otherRecs.map((rec) => (
+              <div key={rec.id} className="card">
+                <div className="flex items-start justify-between mb-3">
+                  <a href={`/@${rec.influencer.username}`} className="group">
+                    <p className="font-semibold group-hover:text-[var(--color-primary)] transition-colors">
+                      {rec.influencer.displayName}
+                    </p>
+                    <p className="text-sm text-[var(--color-foreground-muted)]">
+                      @{rec.influencer.username}
+                    </p>
+                  </a>
+                  {rec.hasOffer && (
+                    <span className="badge-offer">🎁 Offer</span>
+                  )}
+                </div>
+
+                <p className="text-[var(--color-foreground-secondary)]">
+                  <span className="font-medium text-[var(--color-foreground)]">
+                    Try:
+                  </span>{" "}
+                  {rec.dishes.join(", ")}
+                </p>
+
+                {rec.notes && (
+                  <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
+                    "{rec.notes}"
+                  </p>
+                )}
+
+                {rec.hasOffer && rec.offerDetails && (
+                  <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-sm text-green-800 dark:text-green-200">
+                      <span className="font-medium">🎁 Offer:</span>{" "}
+                      {rec.offerDetails}
+                    </p>
+                    {rec.offerExpiry && (
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                        Expires:{" "}
+                        {new Date(rec.offerExpiry).toLocaleDateString("en-GB")}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {rec.videoUrl && (
+                  <a
+                    href={rec.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => handleVideoClick(rec)}
+                    className="link text-sm inline-block mt-3"
+                  >
+                    Watch video →
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        !featuredRec && (
+          <EmptyState
+            icon="🍜"
+            title="No recommendations yet"
+            description="This place hasn't been recommended by any influencers yet."
+          />
+        )
       )}
     </div>
   );

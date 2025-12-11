@@ -379,6 +379,16 @@ export default function PlaceCards({
                             influencers
                           </p>
                         )}
+                      {place.recommendations?.some(
+                        (rec) =>
+                          rec.hasOffer &&
+                          (!rec.offerExpiry ||
+                            new Date(rec.offerExpiry) > new Date())
+                      ) && (
+                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                          🎁 Offer available
+                        </p>
+                      )}
                     </div>
                   ) : (
                     // Influencer mode: Show that influencer's dishes + notes + offer
@@ -425,7 +435,9 @@ export default function PlaceCards({
                   </a>
 
                   <a
-                    href={`/place/${place.id}`}
+                    href={`/place/${place.id}${
+                      influencer ? `?from=${influencer.username}` : ""
+                    }`}
                     onClick={(e) => e.stopPropagation()}
                     className="btn-secondary text-sm py-2 px-3"
                   >

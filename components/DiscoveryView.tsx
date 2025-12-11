@@ -214,6 +214,16 @@ export default function DiscoveryView({ places }: Props) {
                   Recommended by {place.recommendations.length} influencers
                 </p>
               )}
+
+              {place.recommendations.some(
+                (rec) =>
+                  rec.hasOffer &&
+                  (!rec.offerExpiry || new Date(rec.offerExpiry) > new Date())
+              ) && (
+                <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                  🎁 Offer available
+                </p>
+              )}
             </div>
           );
         })}

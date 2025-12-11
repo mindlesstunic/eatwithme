@@ -262,7 +262,7 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
               <div className="flex items-start justify-between">
                 <div>
                   <a
-                    href={`/place/${rec.place.id}`}
+                    href={`/place/${rec.place.id}?from=${influencer.username}`}
                     className="text-lg font-semibold hover:text-[var(--color-primary)] transition-colors"
                   >
                     {rec.place.name}
@@ -314,7 +314,8 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                   </p>
                   {rec.offerExpiry && (
                     <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                      Expires: {new Date(rec.offerExpiry).toLocaleDateString('en-GB')}
+                      Expires:{" "}
+                      {new Date(rec.offerExpiry).toLocaleDateString("en-GB")}
                     </p>
                   )}
                 </div>
