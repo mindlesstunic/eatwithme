@@ -381,7 +381,7 @@ export default function PlaceCards({
                         )}
                     </div>
                   ) : (
-                    // Influencer mode: Show that influencer's dishes + notes
+                    // Influencer mode: Show that influencer's dishes + notes + offer
                     <div>
                       {firstRec && (
                         <>
@@ -394,6 +394,11 @@ export default function PlaceCards({
                           {firstRec.notes && (
                             <p className="text-xs text-[var(--color-foreground-muted)] mt-1 italic line-clamp-1">
                               "{firstRec.notes}"
+                            </p>
+                          )}
+                          {firstRec.hasOffer && firstRec.offerDetails && (
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-1 line-clamp-1">
+                              🎁 {firstRec.offerDetails}
                             </p>
                           )}
                         </>

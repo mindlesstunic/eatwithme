@@ -108,6 +108,13 @@ function MapContent({
       {places.map((place) => {
         const isSelected = place.id === selectedPlaceId;
 
+        // Check if place has any active offer (not expired)
+        const hasActiveOffer = place.recommendations?.some(
+          (rec) =>
+            rec.hasOffer &&
+            (!rec.offerExpiry || new Date(rec.offerExpiry) > new Date())
+        );
+
         return (
           <AdvancedMarker
             key={place.id}
@@ -115,17 +122,35 @@ function MapContent({
             title={place.name}
             onClick={() => handleMarkerClick(place)}
           >
-            <div
-              className={`
-                rounded-full border-2 border-white shadow-lg 
-                cursor-pointer transition-all duration-200
-                ${
-                  isSelected
-                    ? "w-6 h-6 bg-[var(--color-primary)] scale-125"
-                    : "w-4 h-4 bg-[var(--color-primary)] hover:scale-110"
-                }
-              `}
-            />
+            {hasActiveOffer ? (
+              // Offer marker - green with gift icon
+              <div
+                className={`
+            flex items-center justify-center
+            rounded-full border-2 border-white shadow-lg 
+            cursor-pointer transition-all duration-200
+            bg-green-500
+            ${isSelected ? "w-8 h-8 scale-110" : "w-7 h-7 hover:scale-110"}
+          `}
+              >
+                <span className={`${isSelected ? "text-sm" : "text-xs"}`}>
+                  🎁
+                </span>
+              </div>
+            ) : (
+              // Regular marker - coral circle
+              <div
+                className={`
+            rounded-full border-2 border-white shadow-lg 
+            cursor-pointer transition-all duration-200
+            ${
+              isSelected
+                ? "w-6 h-6 bg-[var(--color-primary)] scale-125"
+                : "w-4 h-4 bg-[var(--color-primary)] hover:scale-110"
+            }
+          `}
+              />
+            )}
           </AdvancedMarker>
         );
       })}
