@@ -94,6 +94,7 @@ export async function POST(request: Request) {
         data: {
           name: place.name,
           address: place.address,
+          area: place.area || null,
           city: place.city,
           latitude: lat,
           longitude: lng,

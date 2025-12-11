@@ -32,6 +32,7 @@ model Place {
   locationNotes   String?
   createdAt       DateTime         @default(now())
   category        String           @default("restaurant")
+  area            String?
   events          Event[]
   recommendations Recommendation[]
 }

@@ -19,6 +19,7 @@ type Place = {
   id: string;
   name: string;
   address: string;
+  area?: string;
   city: string;
   latitude: number;
   longitude: number;
@@ -135,6 +136,7 @@ export default function DiscoveryView({ places }: Props) {
           fullHeight={true}
           center={userLocation || undefined}
           mode="discovery"
+          userLocation={userLocation}
         />
       </div>
     );
@@ -179,7 +181,7 @@ export default function DiscoveryView({ places }: Props) {
                     {place.name}
                   </a>
                   <p className="text-[var(--color-foreground-secondary)] text-sm">
-                    {place.address}
+                    {place.area || place.address}
                   </p>
                 </div>
                 {distance !== null && (

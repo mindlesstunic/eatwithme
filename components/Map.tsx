@@ -45,6 +45,7 @@ type MapProps = {
   places?: Place[];
   fullHeight?: boolean;
   mode?: "discovery" | "influencer";
+  userLocation?: { lat: number; lng: number } | null;
 };
 
 // ============================================
@@ -211,13 +212,14 @@ export default function Map({
   places = [],
   fullHeight = false,
   mode = "discovery",
+  userLocation: externalUserLocation = null,
 }: MapProps) {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
-  } | null>(null);
+  } | null>(externalUserLocation);
   const [locating, setLocating] = useState(false);
   const [centerTarget, setCenterTarget] = useState<{
     lat: number;
@@ -226,6 +228,12 @@ export default function Map({
   const [showUserMarker, setShowUserMarker] = useState(false);
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  useEffect(() => {
+    if (externalUserLocation) {
+      setUserLocation(externalUserLocation);
+    }
+  }, [externalUserLocation]);
 
   useEffect(() => {
     if (places.length > 0 && !selectedPlaceId) {

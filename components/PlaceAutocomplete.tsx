@@ -6,6 +6,7 @@ import { useMapsLibrary } from "@vis.gl/react-google-maps";
 type PlaceResult = {
   name: string;
   address: string;
+  area: string;
   city: string;
   latitude: number;
   longitude: number;
@@ -71,11 +72,19 @@ export default function PlaceAutocomplete({ onPlaceSelect }: Props) {
         ],
       });
 
-      // Extract city from address components
+      // Extract city and area from address components
       let city = "";
+      let area = "";
+
       placeDetails.addressComponents?.forEach((component) => {
         if (component.types.includes("locality")) {
           city = component.longText || "";
+        }
+        if (
+          component.types.includes("sublocality_level_1") ||
+          component.types.includes("neighborhood")
+        ) {
+          area = component.longText || "";
         }
       });
 
@@ -91,6 +100,7 @@ export default function PlaceAutocomplete({ onPlaceSelect }: Props) {
           "",
         address: placeDetails.formattedAddress || "",
         city: city || "Unknown",
+        area: area || "",
         latitude: placeDetails.location.lat(),
         longitude: placeDetails.location.lng(),
         googlePlaceId: placeDetails.id || "",

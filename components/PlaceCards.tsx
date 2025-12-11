@@ -29,6 +29,7 @@ type Place = {
   id: string;
   name: string;
   address: string;
+  area?: string;
   latitude: number;
   longitude: number;
   recommendations?: Recommendation[];
@@ -154,7 +155,7 @@ export default function PlaceCards({
                     </div>
                   </div>
                   <p className="text-sm text-[var(--color-foreground-secondary)] line-clamp-1">
-                    {place.address}
+                    {place.area || place.address}
                   </p>
                 </div>
 

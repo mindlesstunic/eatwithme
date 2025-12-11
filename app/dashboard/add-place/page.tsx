@@ -17,6 +17,7 @@ export default function AddPlacePage() {
   const [placeName, setPlaceName] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [locationNotes, setLocationNotes] = useState("");
@@ -34,6 +35,7 @@ export default function AddPlacePage() {
   const handlePlaceSelect = (place: {
     name: string;
     address: string;
+    area: string;
     city: string;
     latitude: number;
     longitude: number;
@@ -41,6 +43,7 @@ export default function AddPlacePage() {
   }) => {
     setPlaceName(place.name);
     setAddress(place.address);
+    setArea(place.area);
     setCity(place.city);
     setLatitude(place.latitude.toString());
     setLongitude(place.longitude.toString());
@@ -59,6 +62,7 @@ export default function AddPlacePage() {
         place: {
           name: placeName,
           address,
+          area,
           city,
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),

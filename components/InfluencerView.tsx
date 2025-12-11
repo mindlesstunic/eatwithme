@@ -28,6 +28,7 @@ type Recommendation = {
     id: string;
     name: string;
     address: string;
+    area?: string;
     latitude: number;
     longitude: number;
   };
@@ -118,6 +119,7 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
     id: rec.place.id,
     name: rec.place.name,
     address: rec.place.address,
+    area: rec.place.area,
     latitude: rec.place.latitude,
     longitude: rec.place.longitude,
     recommendations: [
@@ -167,6 +169,7 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
           fullHeight={true}
           center={userLocation || undefined}
           mode="influencer"
+          userLocation={userLocation}
         />
       </div>
     );
@@ -260,7 +263,7 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                     {rec.place.name}
                   </a>
                   <p className="text-[var(--color-foreground-secondary)] text-sm">
-                    {rec.place.address}
+                    {rec.place.area || rec.place.address}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
