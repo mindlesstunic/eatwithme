@@ -278,15 +278,18 @@ export default function PlaceCards({
     <div className="absolute bottom-0 left-0 right-0 z-10">
       {/* Gradient fade */}
       <div className="h-8 bg-gradient-to-t from-[var(--color-background)] to-transparent" />
-      {/* Influencer Banner - only in influencer mode */}
-      {influencer && (
-        <InfluencerBanner
-          influencer={influencer}
-          placeCount={sortedPlaces.length}
-        />
-      )}
-      {/* Scrollable cards */}
+  
+      {/* Bottom section with solid background */}
       <div className="bg-[var(--color-background)] pb-4">
+        {/* Influencer Banner - only in influencer mode */}
+        {influencer && (
+          <div className="pt-1">
+            <InfluencerBanner influencer={influencer} placeCount={sortedPlaces.length} />
+          </div>
+        )}
+  
+        {/* Scrollable cards */}
+
         <div
           ref={scrollContainerRef}
           className="flex gap-3 overflow-x-auto px-4 pb-2 snap-x snap-mandatory scrollbar-hide"
