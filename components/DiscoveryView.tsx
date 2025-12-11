@@ -14,7 +14,6 @@ import EmptyState from "@/components/EmptyState";
 import { getDistanceKm, formatDistance } from "@/lib/distance";
 import { track } from "@/lib/track";
 import { usePageView } from "@/hooks/usePageView";
-
 type Place = {
   id: string;
   name: string;
@@ -27,7 +26,9 @@ type Place = {
     id: string;
     dishes: string[];
     videoUrl: string | null;
-    isSponsored: boolean;
+    hasOffer: boolean;
+    offerDetails: string | null;
+    offerExpiry: Date | null;
     influencer: {
       displayName: string;
       username: string;

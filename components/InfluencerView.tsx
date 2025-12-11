@@ -18,7 +18,9 @@ type Recommendation = {
   id: string;
   dishes: string[];
   videoUrl: string | null;
-  isSponsored: boolean;
+  hasOffer: boolean;
+  offerDetails?: string | null;
+  offerExpiry?: Date | null;
   notes?: string | null;
   influencer: {
     displayName: string;
@@ -127,7 +129,9 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
         id: rec.id,
         dishes: rec.dishes,
         videoUrl: rec.videoUrl,
-        isSponsored: rec.isSponsored,
+        hasOffer: rec.hasOffer,
+        offerDetails: rec.offerDetails,
+        offerExpiry: rec.offerExpiry,
         notes: rec.notes,
         influencer: {
           displayName: influencer.displayName,
@@ -268,8 +272,8 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {rec.isSponsored && (
-                    <span className="badge-sponsored">Sponsored</span>
+                  {rec.hasOffer && (
+                    <span className="badge-offer">🎁 Offer</span>
                   )}
                   {distance !== null && (
                     <span className="text-sm text-[var(--color-foreground-muted)] whitespace-nowrap">
@@ -300,6 +304,20 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                 <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
                   "{rec.notes}"
                 </p>
+              )}
+
+              {rec.hasOffer && rec.offerDetails && (
+                <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    <span className="font-medium">🎁 Offer:</span>{" "}
+                    {rec.offerDetails}
+                  </p>
+                  {rec.offerExpiry && (
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                      Expires: {new Date(rec.offerExpiry).toLocaleDateString('en-GB')}
+                    </p>
+                  )}
+                </div>
               )}
 
               {rec.videoUrl && (

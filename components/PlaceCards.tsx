@@ -17,7 +17,9 @@ type Recommendation = {
   id: string;
   dishes: string[];
   videoUrl?: string | null;
-  isSponsored: boolean;
+  hasOffer: boolean;
+  offerDetails?: string | null;
+  offerExpiry?: Date | null;
   notes?: string | null;
   influencer: {
     displayName: string;
@@ -278,16 +280,19 @@ export default function PlaceCards({
     <div className="absolute bottom-0 left-0 right-0 z-10">
       {/* Gradient fade */}
       <div className="h-8 bg-gradient-to-t from-[var(--color-background)] to-transparent" />
-  
+
       {/* Bottom section with solid background */}
       <div className="bg-[var(--color-background)] pb-4">
         {/* Influencer Banner - only in influencer mode */}
         {influencer && (
           <div className="pt-1">
-            <InfluencerBanner influencer={influencer} placeCount={sortedPlaces.length} />
+            <InfluencerBanner
+              influencer={influencer}
+              placeCount={sortedPlaces.length}
+            />
           </div>
         )}
-  
+
         {/* Scrollable cards */}
 
         <div
@@ -336,10 +341,8 @@ export default function PlaceCards({
                       {place.name}
                     </h3>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      {mode === "influencer" && firstRec?.isSponsored && (
-                        <span className="badge-sponsored text-xs">
-                          Sponsored
-                        </span>
+                      {mode === "influencer" && firstRec?.hasOffer && (
+                        <span className="badge-offer text-xs">🎁 Offer</span>
                       )}
                       {distance !== null && (
                         <span className="text-xs text-[var(--color-foreground-muted)] whitespace-nowrap">

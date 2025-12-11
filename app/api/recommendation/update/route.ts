@@ -40,8 +40,15 @@ export async function POST(request: Request) {
     // ============================================
     // 3. Parse request body
     // ============================================
-    const { recommendationId, dishes, videoUrl, isSponsored, notes } =
-      await request.json();
+    const {
+      recommendationId,
+      dishes,
+      videoUrl,
+      hasOffer,
+      offerDetails,
+      offerExpiry,
+      notes,
+    } = await request.json();
 
     if (!recommendationId) {
       return NextResponse.json(
@@ -86,7 +93,9 @@ export async function POST(request: Request) {
       data: {
         dishes,
         videoUrl: videoUrl || null,
-        isSponsored: isSponsored || false,
+        hasOffer: hasOffer || false,
+        offerDetails: hasOffer ? offerDetails || null : null,
+        offerExpiry: hasOffer && offerExpiry ? new Date(offerExpiry) : null,
         notes: notes || null,
       },
     });

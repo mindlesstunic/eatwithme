@@ -27,7 +27,9 @@ export default function AddPlacePage() {
   // Recommendation fields
   const [dishes, setDishes] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [isSponsored, setIsSponsored] = useState(false);
+  const [hasOffer, setHasOffer] = useState(false);
+  const [offerDetails, setOfferDetails] = useState("");
+  const [offerExpiry, setOfferExpiry] = useState("");
   const [notes, setNotes] = useState("");
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -76,7 +78,9 @@ export default function AddPlacePage() {
             .map((d) => d.trim())
             .filter(Boolean),
           videoUrl: videoUrl || null,
-          isSponsored,
+          hasOffer,
+          offerDetails: hasOffer ? offerDetails || null : null,
+          offerExpiry: hasOffer ? offerExpiry || null : null,
           notes: notes || null,
         },
       }),
@@ -285,17 +289,52 @@ export default function AddPlacePage() {
             />
           </div>
 
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="sponsored"
-              checked={isSponsored}
-              onChange={(e) => setIsSponsored(e.target.checked)}
-              className="w-5 h-5"
-            />
-            <label htmlFor="sponsored" className="text-sm">
-              This is a sponsored recommendation
-            </label>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="hasOffer"
+                checked={hasOffer}
+                onChange={(e) => setHasOffer(e.target.checked)}
+                className="w-4 h-4 accent-[var(--color-primary)]"
+              />
+              <label htmlFor="hasOffer" className="text-sm">
+                This place has a special offer
+              </label>
+            </div>
+
+            {hasOffer && (
+              <div className="ml-6 space-y-3 p-4 bg-[var(--color-background-secondary)] rounded-lg">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Offer Details *
+                  </label>
+                  <input
+                    type="text"
+                    value={offerDetails}
+                    onChange={(e) => setOfferDetails(e.target.value)}
+                    className="input"
+                    placeholder="e.g., 20% off on weekdays, Free dessert with meal"
+                    required={hasOffer}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Offer Expiry Date
+                  </label>
+                  <input
+                    type="date"
+                    value={offerExpiry}
+                    onChange={(e) => setOfferExpiry(e.target.value)}
+                    className="input"
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                  <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
+                    Leave empty if no expiry
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

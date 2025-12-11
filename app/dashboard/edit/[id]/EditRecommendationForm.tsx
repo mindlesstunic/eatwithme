@@ -15,7 +15,9 @@ type Props = {
     id: string;
     dishes: string[];
     videoUrl: string | null;
-    isSponsored: boolean;
+    hasOffer: boolean;
+    offerDetails: string | null;
+    offerExpiry: Date | null;
     notes: string | null;
     place: {
       name: string;
@@ -32,9 +34,16 @@ export default function EditRecommendationForm({ recommendation }: Props) {
   // ============================================
   const [dishes, setDishes] = useState(recommendation.dishes.join(", "));
   const [videoUrl, setVideoUrl] = useState(recommendation.videoUrl || "");
-  const [isSponsored, setIsSponsored] = useState(recommendation.isSponsored);
+  const [hasOffer, setHasOffer] = useState(recommendation.hasOffer);
+  const [offerDetails, setOfferDetails] = useState(
+    recommendation.offerDetails || ""
+  );
+  const [offerExpiry, setOfferExpiry] = useState(
+    recommendation.offerExpiry
+      ? new Date(recommendation.offerExpiry).toISOString().split("T")[0]
+      : ""
+  );
   const [notes, setNotes] = useState(recommendation.notes || "");
-
   // ============================================
   // UI state
   // ============================================
@@ -59,7 +68,9 @@ export default function EditRecommendationForm({ recommendation }: Props) {
           .map((d) => d.trim())
           .filter(Boolean),
         videoUrl: videoUrl || null,
-        isSponsored,
+        hasOffer,
+        offerDetails: hasOffer ? offerDetails || null : null,
+        offerExpiry: hasOffer ? offerExpiry || null : null,
         notes: notes || null,
       }),
     });
@@ -139,17 +150,52 @@ export default function EditRecommendationForm({ recommendation }: Props) {
       {/* ============================================
           Sponsored Checkbox
           ============================================ */}
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="sponsored"
-          checked={isSponsored}
-          onChange={(e) => setIsSponsored(e.target.checked)}
-          className="w-4 h-4"
-        />
-        <label htmlFor="sponsored" className="text-sm">
-          This is a sponsored recommendation
-        </label>
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="hasOffer"
+            checked={hasOffer}
+            onChange={(e) => setHasOffer(e.target.checked)}
+            className="w-4 h-4 accent-[var(--color-primary)]"
+          />
+          <label htmlFor="hasOffer" className="text-sm">
+            This place has a special offer
+          </label>
+        </div>
+
+        {hasOffer && (
+          <div className="ml-6 space-y-3 p-4 bg-[var(--color-background-secondary)] rounded-lg">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Offer Details *
+              </label>
+              <input
+                type="text"
+                value={offerDetails}
+                onChange={(e) => setOfferDetails(e.target.value)}
+                className="input"
+                placeholder="e.g., 20% off on weekdays, Free dessert with meal"
+                required={hasOffer}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Offer Expiry Date
+              </label>
+              <input
+                type="date"
+                value={offerExpiry}
+                onChange={(e) => setOfferExpiry(e.target.value)}
+                className="input"
+                min={new Date().toISOString().split("T")[0]}
+              />
+              <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
+                Leave empty if no expiry
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ============================================

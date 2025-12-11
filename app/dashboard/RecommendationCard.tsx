@@ -16,7 +16,9 @@ type Props = {
     id: string;
     dishes: string[];
     videoUrl: string | null;
-    isSponsored: boolean;
+    hasOffer: boolean;
+    offerDetails: string | null;
+    offerExpiry: Date | null;
     notes: string | null;
     place: {
       id: string;
@@ -69,8 +71,8 @@ export default function RecommendationCard({ recommendation }: Props) {
           </p>
         </div>
 
-        {recommendation.isSponsored && (
-          <span className="badge-sponsored">Sponsored</span>
+        {recommendation.hasOffer && (
+          <span className="badge-offer">🎁 Offer</span>
         )}
       </div>
 
@@ -86,6 +88,21 @@ export default function RecommendationCard({ recommendation }: Props) {
         <p className="text-[var(--color-foreground-muted)] text-sm mt-2 italic">
           "{recommendation.notes}"
         </p>
+      )}
+
+      {recommendation.hasOffer && recommendation.offerDetails && (
+        <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          <p className="text-sm text-green-800 dark:text-green-200">
+            <span className="font-medium">🎁 Offer:</span>{" "}
+            {recommendation.offerDetails}
+          </p>
+          {recommendation.offerExpiry && (
+            <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+              Expires:{" "}
+              {new Date(recommendation.offerExpiry).toLocaleDateString("en-GB")}
+            </p>
+          )}
+        </div>
       )}
 
       {recommendation.videoUrl && (

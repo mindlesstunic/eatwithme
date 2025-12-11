@@ -22,7 +22,9 @@ type Recommendation = {
   id: string;
   dishes: string[];
   videoUrl?: string | null;
-  isSponsored: boolean;
+  hasOffer: boolean;
+  offerDetails?: string | null;
+  offerExpiry?: Date | null;
   notes?: string | null;
   influencer: {
     displayName: string;

@@ -41,7 +41,9 @@ model Recommendation {
   id           String     @id @default(cuid())
   dishes       String[]
   videoUrl     String?
-  isSponsored  Boolean    @default(false)
+  hasOffer     Boolean    @default(false)
+  offerDetails String?
+  offerExpiry  DateTime?
   notes        String?
   createdAt    DateTime   @default(now())
   influencerId String
@@ -50,7 +52,6 @@ model Recommendation {
   influencer   Influencer @relation(fields: [influencerId], references: [id])
   place        Place      @relation(fields: [placeId], references: [id])
 }
-
 model Event {
   id               String          @id @default(cuid())
   type             String

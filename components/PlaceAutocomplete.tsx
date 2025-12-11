@@ -65,7 +65,7 @@ export default function PlaceAutocomplete({ onPlaceSelect }: Props) {
           ...(userLocation && {
             locationBias: {
               center: userLocation,
-              radius: 100000, // 100km - wider radius
+              radius: 50000, // 100km - wider radius
             },
           }),
         });

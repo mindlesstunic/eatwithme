@@ -110,7 +110,11 @@ export async function POST(request: Request) {
       data: {
         dishes: recommendation.dishes,
         videoUrl: recommendation.videoUrl,
-        isSponsored: recommendation.isSponsored || false,
+        hasOffer: recommendation.hasOffer || false,
+        offerDetails: recommendation.offerDetails || null,
+        offerExpiry: recommendation.offerExpiry
+          ? new Date(recommendation.offerExpiry)
+          : null,
         notes: recommendation.notes,
         influencerId: influencer.id,
         placeId: existingPlace.id,
