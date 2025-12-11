@@ -46,6 +46,13 @@ type MapProps = {
   fullHeight?: boolean;
   mode?: "discovery" | "influencer";
   userLocation?: { lat: number; lng: number } | null;
+  influencer?: {
+    displayName: string;
+    username: string;
+    instagram?: string | null;
+    youtube?: string | null;
+    profileImage?: string | null;
+  };
 };
 
 // ============================================
@@ -213,6 +220,7 @@ export default function Map({
   fullHeight = false,
   mode = "discovery",
   userLocation: externalUserLocation = null,
+  influencer,
 }: MapProps) {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -321,8 +329,12 @@ export default function Map({
           />
         </GoogleMap>
 
-        {/* Current Location Button */}
-        <div className="absolute bottom-[220px] right-4 z-20">
+        {/* Current Location Button - pushed up when banner present */}
+        <div
+          className={`absolute right-4 z-20 ${
+            influencer ? "bottom-[320px]" : "bottom-[290px]"
+          }`}
+        >
           <CurrentLocationButton onLocate={handleLocate} loading={locating} />
         </div>
 
@@ -333,6 +345,7 @@ export default function Map({
           onPlaceSelect={handleCardSelect}
           mode={mode}
           userLocation={userLocation}
+          influencer={influencer}
         />
       </div>
     </APIProvider>

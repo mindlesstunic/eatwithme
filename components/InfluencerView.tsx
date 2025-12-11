@@ -170,6 +170,7 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
           center={userLocation || undefined}
           mode="influencer"
           userLocation={userLocation}
+          influencer={influencer}
         />
       </div>
     );
