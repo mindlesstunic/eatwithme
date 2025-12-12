@@ -418,8 +418,8 @@ export default function PlaceCards({
                 </div>
 
                 {/* ============================================
-                    Actions - Bottom (always at bottom)
-                    ============================================ */}
+    Actions - Bottom (always at bottom)
+    ============================================ */}
                 <div className="flex gap-2 mt-3">
                   <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
@@ -434,15 +434,53 @@ export default function PlaceCards({
                     Directions
                   </a>
 
-                  <a
-                    href={`/place/${place.id}${
-                      influencer ? `?from=${influencer.username}` : ""
-                    }`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="btn-secondary text-sm py-2 px-3"
-                  >
-                    Details
-                  </a>
+                  {mode === "influencer" && firstRec?.videoUrl ? (
+                    <>
+                      <a
+                        href={firstRec.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          track({ type: "video_click", placeId: place.id });
+                        }}
+                        className="flex-1 btn-primary text-sm text-center py-2"
+                      >
+                        Video
+                      </a>
+
+                      <a
+                        href={`/place/${place.id}?from=${influencer?.username}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="btn-secondary text-sm py-2 px-3 flex items-center justify-center"
+                        title="Details"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </a>
+                    </>
+                  ) : (
+                    <a
+                      href={`/place/${place.id}${
+                        influencer ? `?from=${influencer.username}` : ""
+                      }`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="btn-secondary text-sm py-2 px-3"
+                    >
+                      Details
+                    </a>
+                  )}
                 </div>
               </div>
             );

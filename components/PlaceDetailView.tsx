@@ -205,17 +205,26 @@ export default function PlaceDetailView({ place }: Props) {
               </div>
             )}
 
-            {featuredRec.videoUrl && (
+            {/* Action Buttons */}
+            <div className="flex gap-2 mt-4">
               <a
-                href={featuredRec.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => handleVideoClick(featuredRec)}
-                className="link text-sm inline-block mt-3"
+                href={`/@${featuredRec.influencer.username}`}
+                className="flex-1 btn-secondary text-sm text-center py-2"
               >
-                Watch video →
+                Profile
               </a>
-            )}
+              {featuredRec.videoUrl && (
+                <a
+                  href={featuredRec.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleVideoClick(featuredRec)}
+                  className="flex-1 btn-primary text-sm text-center py-2"
+                >
+                  Video
+                </a>
+              )}
+            </div>
           </div>
         </>
       )}
@@ -278,17 +287,26 @@ export default function PlaceDetailView({ place }: Props) {
                   </div>
                 )}
 
-                {rec.videoUrl && (
+                {/* Action Buttons */}
+                <div className="flex gap-2 mt-4">
                   <a
-                    href={rec.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => handleVideoClick(rec)}
-                    className="link text-sm inline-block mt-3"
+                    href={`/@${rec.influencer.username}`}
+                    className="flex-1 btn-secondary text-sm text-center py-2"
                   >
-                    Watch video →
+                    Profile
                   </a>
-                )}
+                  {rec.videoUrl && (
+                    <a
+                      href={rec.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleVideoClick(rec)}
+                      className="flex-1 btn-primary text-sm text-center py-2"
+                    >
+                      Video
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>

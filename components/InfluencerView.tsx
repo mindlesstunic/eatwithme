@@ -283,16 +283,6 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                 </div>
               </div>
 
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${rec.place.latitude},${rec.place.longitude}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => handleDirectionClick(rec)}
-                className="link text-sm inline-block mt-2"
-              >
-                Get directions →
-              </a>
-
               <p className="text-[var(--color-foreground-secondary)] mt-3">
                 <span className="font-medium text-[var(--color-foreground)]">
                   Try:
@@ -321,17 +311,59 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
                 </div>
               )}
 
-              {rec.videoUrl && (
+              {/* Action Buttons */}
+              <div className="flex gap-2 mt-4">
                 <a
-                  href={rec.videoUrl}
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${rec.place.latitude},${rec.place.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => handleVideoClick(rec)}
-                  className="link text-sm inline-block mt-2"
+                  onClick={() => handleDirectionClick(rec)}
+                  className="flex-1 btn-primary text-sm text-center py-2"
                 >
-                  Watch video →
+                  Directions
                 </a>
-              )}
+
+                {rec.videoUrl ? (
+                  <>
+                    <a
+                      href={rec.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleVideoClick(rec)}
+                      className="flex-1 btn-primary text-sm text-center py-2"
+                    >
+                      Video
+                    </a>
+
+                    <a
+                      href={`/place/${rec.place.id}?from=${influencer.username}`}
+                      className="btn-secondary text-sm py-2 px-3 flex items-center justify-center"
+                      title="Details"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </a>
+                  </>
+                ) : (
+                  <a
+                    href={`/place/${rec.place.id}?from=${influencer.username}`}
+                    className="btn-secondary text-sm py-2 px-3"
+                  >
+                    Details
+                  </a>
+                )}
+              </div>
             </div>
           );
         })}

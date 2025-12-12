@@ -192,7 +192,7 @@ export default function DiscoveryView({ places }: Props) {
                 )}
               </div>
 
-              <a
+              {/* <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -200,7 +200,7 @@ export default function DiscoveryView({ places }: Props) {
                 className="link text-sm inline-block mt-2"
               >
                 Get directions →
-              </a>
+              </a> */}
 
               <p className="text-[var(--color-foreground-secondary)] mt-3">
                 <span className="font-medium text-[var(--color-foreground)]">
@@ -224,6 +224,25 @@ export default function DiscoveryView({ places }: Props) {
                   🎁 Offer available
                 </p>
               )}
+              {/* Action Buttons */}
+              <div className="flex gap-2 mt-4">
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleDirectionClick(place)}
+                  className="flex-1 btn-primary text-sm text-center py-2"
+                >
+                  Directions
+                </a>
+
+                <a
+                  href={`/place/${place.id}`}
+                  className="btn-secondary text-sm py-2 px-3"
+                >
+                  Details
+                </a>
+              </div>
             </div>
           );
         })}
