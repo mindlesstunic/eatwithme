@@ -55,6 +55,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         }`,
       type: "profile",
       url: `https://eatwithme.app/@${influencer.username}`,
+      ...(influencer.profileImage && {
+        images: [
+          {
+            url: influencer.profileImage,
+            width: 400,
+            height: 400,
+            alt: influencer.displayName,
+          },
+        ],
+      }),
     },
     twitter: {
       card: "summary",
@@ -64,6 +74,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         `${placeCount} food recommendation${placeCount !== 1 ? "s" : ""} from ${
           influencer.displayName
         }`,
+      ...(influencer.profileImage && {
+        images: [influencer.profileImage],
+      }),
     },
   };
 }

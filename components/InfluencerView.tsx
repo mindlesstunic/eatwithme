@@ -48,12 +48,62 @@ type Props = {
   };
 };
 
+function LocationBanner({
+  onEnable,
+  onDismiss,
+}: {
+  onEnable: () => void;
+  onDismiss: () => void;
+}) {
+  return (
+    <div className="mx-4 mb-2 px-4 py-3 rounded-[var(--radius-lg)] bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-lg">📍</span>
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            Enable location to sort by distance
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={onEnable}
+            className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-[var(--radius-md)] hover:bg-blue-700 transition-colors"
+          >
+            Enable
+          </button>
+          <button
+            onClick={onDismiss}
+            className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/50 rounded-[var(--radius-md)] transition-colors"
+            aria-label="Dismiss"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function InfluencerView({ recommendations, influencer }: Props) {
   const [view, setView] = useState<"map" | "list">("map");
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+  const [locationDenied, setLocationDenied] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -66,8 +116,11 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
         },
         (error) => {
           console.log("Geolocation error:", error.message);
+          setLocationDenied(true);
         }
       );
+    } else {
+      setLocationDenied(true);
     }
   }, []);
 
@@ -97,6 +150,26 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
     });
   };
 
+  const handleEnableLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setLocationDenied(false);
+        },
+        (error) => {
+          console.log("Geolocation error:", error.message);
+          alert(
+            "Unable to get location. Please enable it in your browser settings."
+          );
+        }
+      );
+    }
+  };
+
   const sortedRecommendations = userLocation
     ? [...recommendations].sort((a, b) => {
         const distA = getDistanceKm(
@@ -113,11 +186,16 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
         );
         return distA - distB;
       })
-    : recommendations;
+    : [...recommendations].sort((a, b) => {
+        // Fallback: offers first, then alphabetically
+        if (a.hasOffer && !b.hasOffer) return -1;
+        if (!a.hasOffer && b.hasOffer) return 1;
+        return a.place.name.localeCompare(b.place.name);
+      });
 
   // Transform recommendations to places format for Map component
   // Include notes for influencer mode
-  const places = recommendations.map((rec) => ({
+  const places = sortedRecommendations.map((rec) => ({
     id: rec.place.id,
     name: rec.place.name,
     address: rec.place.address,
@@ -176,6 +254,16 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
           userLocation={userLocation}
           influencer={influencer}
         />
+
+        {/* Location Banner - Above Cards */}
+        {locationDenied && !bannerDismissed && !userLocation && (
+          <div className="absolute bottom-[500px] left-0 right-0 z-30 px-4">
+            <LocationBanner
+              onEnable={handleEnableLocation}
+              onDismiss={() => setBannerDismissed(true)}
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -249,6 +337,16 @@ export default function InfluencerView({ recommendations, influencer }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Location Banner */}
+      {locationDenied && !bannerDismissed && !userLocation && (
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
+          <LocationBanner
+            onEnable={handleEnableLocation}
+            onDismiss={() => setBannerDismissed(true)}
+          />
+        </div>
+      )}
 
       {/* List Content */}
       <div className="p-4 sm:p-6 max-w-5xl mx-auto">
