@@ -267,6 +267,7 @@ export default function Map({
   useEffect(() => {
     if (externalUserLocation) {
       setUserLocation(externalUserLocation);
+      setShowUserMarker(true);
     }
   }, [externalUserLocation]);
 
